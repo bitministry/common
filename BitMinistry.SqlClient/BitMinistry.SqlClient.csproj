@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>
+      net461;
+      net462;
+      net472;
+      net48;
+      netstandard2.0;
+      netstandard2.1;
+      netcoreapp3.1;
+      net5.0;
+    </TargetFrameworks>
+    <!--
+    
+    net46;
+      net463;
+    
+      net47;
+      net471;
+    
+    -->
+
+
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <PackageProjectUrl>http://www.bitMinistry.com</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>    
+    <PackageTags>data mssql utility helper middlewear infra crosscutting</PackageTags>
+    <Authors>Andrew Rebane</Authors>
+    <Description>a lightweight MS Sql adapter</Description>
+
+    
+    <PackageVersion>1.0.4</PackageVersion>
+
+
+
+  </PropertyGroup>
+
+  <ItemGroup>
+  
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    
+    
+    <None Include="README.md" Pack="true" PackagePath="" />
+
+
+  </ItemGroup>
+
+
+
+
+  <Target Name="RenamePack" AfterTargets="Pack">
+    
+    <Move SourceFiles="$(OutputPath)$(PackageId).$(PackageVersion).nupkg" DestinationFiles="$(OutputPath)package.nupkg" />
+
+  </Target>
+
+
+
+
+</Project>
+
+
