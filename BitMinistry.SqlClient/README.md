@@ -1,4 +1,6 @@
 ﻿
+
+
 System.SqlClient objects are disposed within each method 
 
 hook data to your T-SQL fluently 
@@ -20,3 +22,7 @@ var name = "SELECT name FROM myTable WHERE id=1".SqlScalar();
 var result = "some SQL statament".SqlCommandFunk( ( SqlCommand com ) => {  ... do something with the com } );
 
 (System.Data.SqlClient.SqlCommand)
+
+
+
+open source at <https://github.com/bitministry/common>
