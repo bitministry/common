@@ -6,10 +6,6 @@
       net462;
       net472;
       net48;
-      netstandard2.0;
-      netstandard2.1;
-      netcoreapp3.1;
-      net5.0;
     </TargetFrameworks>
 
     <!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo>-->
@@ -17,27 +13,29 @@
 
     <Company>BitMinistry.com</Company>
     <Authors>Andrew Rebane</Authors>
-    <Copyright>Copyright © 2015</Copyright>
+    <Copyright>Copyright © 2016</Copyright>
 
-    <Product>BitMinistry.Common</Product>
-    <Title>BitMinistry.Common</Title>
-    <Description>various infra libraries</Description>
+    <Product>BitMinistry.Common.Settings</Product>
+    <Title>BitMinistry.Common.Settings</Title>
+    <Description>manage settings in sql database</Description>
 
-    
-    <PackageProjectUrl>http://www.bitMinistry.com</PackageProjectUrl>    
+
+    <PackageProjectUrl>http://www.bitMinistry.com</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
-    <PackageTags>utility helper middlewear infra crosscutting</PackageTags>
+    <PackageTags>settings utility helper middlewear infra crosscutting</PackageTags>
 
-    <AssemblyVersion>2.0.3</AssemblyVersion>
-    <PackageVersion>2.0.3</PackageVersion>
+    <AssemblyVersion>1.3.0</AssemblyVersion>
+    <PackageVersion>1.3.0</PackageVersion>
 
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
+    
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>BitMinistry.Common.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>BitMinistry.Common.Settings.snk</AssemblyOriginatorKeyFile>
+
+
 
 
     <!--<EnableComHosting>true</EnableComHosting>-->
@@ -54,11 +52,19 @@
   <ItemGroup>
 
 
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="BitMinistry.Common" Version="2.0.3" />
+    <PackageReference Include="BitMinistry.Common.Data" Version="2.0.3" />
 
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-    
+
+    <Reference Include="System.Web" />
+    <Reference Include="System.Data" />
+
+    <!--<ProjectReference Include="..\BitMinistry.Common\BitMinistry.Common.csproj" />
+    <ProjectReference Include="..\BitMinistry.Common.Data\BitMinistry.Common.Data.csproj" />-->
+
+
     <None Include="README.md" Pack="true" PackagePath="" />
+
 
 
   </ItemGroup>

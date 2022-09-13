@@ -8,12 +8,17 @@ namespace BitMinistry
     {
 
 
-
+        /// <summary>
+        /// append to c:\SimpleLogger\{ typeof(TType) }.csv
+        /// </summary> 
         public static void AppendToCsv<TType>(params string[] values ) {
 
-            AppendToFile( message: string.Join("; ", values), filename: @"c:\SimpleLogger\" + typeof(TType).Name + ".csv");
+            AppendToFile( message: string.Join("; ", values), filename: $@"c:\SimpleLogger\{ typeof(TType).Name }.csv");
         }
 
+        /// <summary>
+        /// append to c:\SimpleLogger\log.csv
+        /// </summary> 
         public static void AppendToFile( string message, string filename = null)
         {
             filename = filename  ?? @"c:\SimpleLogger\log.csv" ;

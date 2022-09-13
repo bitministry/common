@@ -15,11 +15,11 @@ hook data to your T-SQL fluently
 (DataSet and SqlDataAdapter)
 
 
-`"UPDATE myTable SET name=`andrew` WHERE id=1".SqlNonQuery();`
+`"UPDATE myTable SET name='andrew' WHERE id=1".SqlNonQuery();`
 
 `var name = "SELECT name FROM myTable WHERE id=1".SqlScalar();`
 
-`var result = "some SQL statament".SqlCommandFunk( ( SqlCommand com ) => {  ... do something with the com } );`
+`var result = "some SQL statament".SqlCommandFunk( ( SqlCommand com ) => {  ..utilize com.. } );`
 
 (SqlCommand)
 

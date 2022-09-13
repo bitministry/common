@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class Screen
     {

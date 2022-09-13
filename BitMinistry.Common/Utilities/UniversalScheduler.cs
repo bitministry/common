@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Timers;
 using Timer = System.Threading.Timer;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class UniversalScheduler
     {

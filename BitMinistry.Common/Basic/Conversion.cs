@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 
+
 // namespace on purpose, for historical reasons 
-namespace BitMinistry.Common
+namespace BitMinistry
 {
     public class Cnv
     {
@@ -78,7 +78,10 @@ namespace BitMinistry.Common
             return CInt( exp );
         }
 
-        // return format with dot  -123.45
+
+        /// <summary>
+        /// return format with dot  -123.45
+        /// </summary> 
         public static string SweepDecimal( string exp)
         {
             return (exp[0] == '-' ? "-" : "")  // negative / postitive 
@@ -210,7 +213,7 @@ namespace BitMinistry.Common
         public static bool CBool(object str)
         {
             bool ob = false;
-            Boolean.TryParse(str.CStr(), out ob);
+            Boolean.TryParse( CStr( str ), out ob);
             return ob;
         }
 

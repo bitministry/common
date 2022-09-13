@@ -1,11 +1,12 @@
-﻿using System;
+﻿using BitMinistry.Common;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public static class Mirror
     {
@@ -13,7 +14,8 @@ namespace BitMinistry.Common
         public enum InjectRegulation { None, ExcludingNulls, ExcludingDefaults };
 
         /// <summary>
-        /// Inject source properties into the target object; --> </summary>
+        /// Inject source properties into the target object
+        /// </summary>
         public static void InjectInto<TType>(this object source, ref TType target, InjectRegulation injectRegulation = InjectRegulation.None )
         {
             CopyProperties(source, ref target, source.GetType().GetProperties(), injectRegulation);
@@ -21,7 +23,8 @@ namespace BitMinistry.Common
 
 
         /// <summary>
-        /// Inject source properties into the target object, refined by property names; --> </summary>
+        /// Inject source properties into the target object, refined by property names
+        /// </summary>
 
         public static void InjectInto<TType>(this object source, ref TType target, string[] props, InjectRegulation injectRegulation = InjectRegulation.None)
         {
@@ -67,7 +70,8 @@ namespace BitMinistry.Common
         }
 
         /// <summary>
-        /// Create TType object and inject source properties into the target object; refine by property names --> </summary>
+        /// Create TType object and inject source properties into the target object; refine by property names
+        /// </summary>
 
         public static TTarget GetClone<TTarget>(this object source, string[] props = null, InjectRegulation injectRegulation = InjectRegulation.None ) where TTarget : new()
         {
@@ -75,6 +79,10 @@ namespace BitMinistry.Common
             source.InjectInto(ref target, props, injectRegulation );
             return target;
         }
+
+        /// <summary>
+        /// deep copy 
+        /// </summary>
         public static TType GetClone<TType>(this TType source, string[] props = null, InjectRegulation injectRegulation = InjectRegulation.None) where TType : new()
         {
             var target = new TType();

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
 
 

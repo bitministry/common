@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BitMinistry.Common
+namespace BitMinistry
 {
+
+    /// <summary>
+    /// lets not throw errors when key is not found 
+    /// </summary> 
+
     public class SafeDictionary<TKey, TValue>  : Dictionary<TKey, TValue>  
     {
         

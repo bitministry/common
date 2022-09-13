@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using BitMinistry.Common;
+using System.Collections.Generic;
 using System.Linq;
 
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class TaxHelper
     {

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using BitMinistry.Common;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class PeriodicLauncher
     {

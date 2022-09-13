@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class GeoDistance
     {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Globalization;
 using System.Resources;
 
-namespace BitMinistry.Common
+namespace BitMinistry.Utility
 {
     public class Translation
     {
