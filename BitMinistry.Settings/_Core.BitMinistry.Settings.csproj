@@ -1,0 +1,93 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <RuntimeIdentifier>win</RuntimeIdentifier>
+
+    <TargetFrameworks>net48</TargetFrameworks>
+
+    <!--<TargetFrameworks>
+      net461;
+      net462;
+      net472;
+      net48;
+    </TargetFrameworks>-->
+
+    <!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo>-->
+
+
+    <Company>BitMinistry.com</Company>
+    <Authors>Andrew Rebane</Authors>
+    <Copyright>Copyright © 2016</Copyright>
+
+    <Product>BitMinistry.Settings</Product>
+    <Title>BitMinistry.Settings</Title>
+    <Description>manage settings in sql database</Description>
+
+
+    <PackageProjectUrl>http://www.bitMinistry.com</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+    <PackageTags>settings utility helper middlewear infra crosscutting</PackageTags>
+
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <PackageVersion>1.5.0</PackageVersion>
+
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>BitMinistry.Settings.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>BitMinistry.Settings</AssemblyName>
+    <RootNamespace>BitMinistry.Settings</RootNamespace>
+
+
+
+
+    <!--<EnableComHosting>true</EnableComHosting>-->
+
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+
+
+
+    <Reference Include="System.Web" />
+    <Reference Include="System.Data" />
+
+    <ProjectReference Include="..\BitMinistry\_Core.BitMinistry.csproj" />
+    <ProjectReference Include="..\BitMinistry.Data\_Core.BitMinistry.Data.csproj" />
+
+
+    <None Include="README.md" Pack="true" PackagePath="" />
+
+
+    <!--<PackageReference Include="BitMinistry" Version="2.0.5" />
+    <PackageReference Include="BitMinistry.Data" Version="2.0.6" />-->
+    
+    
+  </ItemGroup>
+
+
+
+  <Target Name="RenamePack" AfterTargets="Pack">
+
+    <Move SourceFiles="$(OutputPath)$(PackageId).$(PackageVersion).nupkg" DestinationFiles="$(OutputPath)package.nupkg" />
+
+  </Target>
+
+
+
+
+
+</Project>
+
+

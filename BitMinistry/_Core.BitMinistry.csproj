@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <RuntimeIdentifier>win</RuntimeIdentifier>
+
+    <TargetFrameworks>net48</TargetFrameworks>
+
+    <!--<TargetFrameworks>
+      net461;
+      net462;
+      net472;
+      net48;
+      netstandard2.0;
+      netstandard2.1;
+      netcoreapp3.1;
+      net5.0;
+    </TargetFrameworks>--> 
+
+    <!--<GenerateAssemblyInfo>false</GenerateAssemblyInfo>-->
+
+
+    <Company>BitMinistry.com</Company>
+    <Authors>Andrew Rebane</Authors>
+    <Copyright>Copyright © 2015</Copyright>
+
+    <Product>BitMinistry</Product>
+    <Title>BitMinistry</Title>
+    <Description>various infra libraries</Description>
+
+    
+    <PackageProjectUrl>http://www.bitMinistry.com</PackageProjectUrl>    
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+    <PackageTags>utility helper middlewear infra crosscutting</PackageTags>
+
+    <AssemblyVersion>2.0.5</AssemblyVersion>
+    <PackageVersion>2.0.5</PackageVersion>
+
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>BitMinistry.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>BitMinistry</AssemblyName>
+    <RootNamespace>BitMinistry</RootNamespace>
+
+
+    <!--<EnableComHosting>true</EnableComHosting>-->
+
+
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
+    <DocumentationFile />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    
+    <None Include="README.md" Pack="true" PackagePath="" />
+
+
+  </ItemGroup>
+
+
+
+  <Target Name="RenamePack" AfterTargets="Pack">
+
+    <Move SourceFiles="$(OutputPath)$(PackageId).$(PackageVersion).nupkg" DestinationFiles="$(OutputPath)package.nupkg" />
+
+  </Target>
+
+
+
+
+
+</Project>
+
+

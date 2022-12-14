@@ -13,14 +13,18 @@ namespace BitMinistry
     public class SqlClient
     {
 
-        string _connectionString;
+        public string ConnectionString;
 
         /// <summary>
         /// provide a local connection string, if required 
         /// </summary>   
+        /// <param name="connectionName">if the key dont exist in Config.ConnectionStrings, the connectionName variable is used as a raw Sql connectionString</param>
         public SqlClient( string connectionName = null )
         {
-            _connectionString = Config.ConnectionStrings[connectionName ?? Config.DefaultSqlConnectionName ];
+
+            ConnectionString = Config.ConnectionStrings[connectionName ?? Config.DefaultSqlConnectionName]
+                ?? connectionName; // if no named entry exists, use the connectionName as the connectionString itself
+
 
         }
 
@@ -74,7 +78,7 @@ namespace BitMinistry
         public T CommandFunk<T>(Func<SqlCommand, T> sqlFunc, string query)
         {
 
-            using (var connection = new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(ConnectionString))
             using (var sqlCom = new SqlCommand(query)
             {
                 Connection = connection
