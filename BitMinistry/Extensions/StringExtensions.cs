@@ -118,6 +118,14 @@ namespace BitMinistry
                 : (maxLength < 11 || ! useDots ? str.Substring(0, maxLength) : str.Substring(0, maxLength - 2) + "..");
         }
 
+        public static string CutEnd(this string str, int chars)
+        {
+            return IsNullOrEmpty(str) || str.Length <= chars
+                ? str
+                : str.Substring(0, str.Length - chars );
+        }
+
+
         public static string NewLineToBR(this string str )
         {
             return (str ?? "").Replace( Environment.NewLine, "<BR>");

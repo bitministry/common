@@ -19,24 +19,24 @@ namespace BitMinistry
         /// </summary> 
         public SqlConnectionStringBuilder(string connectionString  ) 
         {
-            connectionString = connectionString?.ToLower();
-
             foreach (var pair in connectionString.Split(';').Where(x => x.Contains('=')))
             {
                 var pp = pair.Split('=').Select(x => x.Trim()).ToArray();
 
-                if (" data dource | address | addr | network address ".IndexOf(pp[0]) > -1)
-                    pp[0] = "server";
-                if (" uid | user ".IndexOf(pp[0]) > -1)
-                    pp[0] = "user id";
-                if (pp[0] == "pwd")
-                    pp[0] = "password";
-                if (pp[0] == "initial catalog")
-                    pp[0] = "database";
-                if (pp[0] == "trusted_connection")
-                    pp[0] = "integrated security";
+                var pkey = pp[0]?.ToLower();
 
-                _tbl[pp[0]] = pp[1];
+                if (" data dource | address | addr | network address ".IndexOf(pkey) > -1)
+                    pkey = "server";
+                if (" uid | user ".IndexOf(pkey) > -1)
+                    pkey = "user id";
+                if (pkey == "pwd")
+                    pkey = "password";
+                if (pkey == "initial catalog")
+                    pkey = "database";
+                if (pkey == "trusted_connection")
+                    pkey = "integrated security";
+
+                _tbl[pkey] = pp[1];
             }
 
             build();
