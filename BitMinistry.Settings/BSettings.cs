@@ -49,7 +49,8 @@ namespace BitMinistry.Settings
             {
                 _excludeModules = excludeModules;
 
-                _connectionName = connectionName ?? _connectionName  ?? "infra";
+                _connectionName = connectionName ?? _connectionName ??
+                    (Config.ConnectionStrings.ContainsKey("infra") ? "infra" : "main") ;
 
 
                 using (var sql = new BSqlRawCommander(_connectionName ))
