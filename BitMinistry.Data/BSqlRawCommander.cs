@@ -16,8 +16,8 @@ namespace BitMinistry.Data
 
 
         /// <param name="connectionName">if the key dont exist in Config.ConnectionStrings, the connectionName variable is used as a raw Sql connectionString</param>
-        public BSqlRawCommander(string connectionName = null, CommandType comType = CommandType.Text, int commandTimeout = 30, string dbSchema = null ) :
-            base (connectionName : connectionName , comType, commandTimeout )
+        public BSqlRawCommander(string connectionName = null, CommandType comType = CommandType.Text, int commandTimeout = 30, string dbSchema = null) :
+            base(connectionName: connectionName, comType: comType, commandTimeout: commandTimeout)
         {
             SetDbSchema( dbSchema );
         }
