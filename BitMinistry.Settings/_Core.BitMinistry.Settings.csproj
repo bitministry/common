@@ -31,8 +31,8 @@
 
     <PackageTags>settings utility helper middlewear infra crosscutting</PackageTags>
 
-    <AssemblyVersion>1.5.0</AssemblyVersion>
-    <PackageVersion>1.5.0</PackageVersion>
+    <AssemblyVersion>2.0.6</AssemblyVersion>
+    <PackageVersion>2.0.6</PackageVersion>
 
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
