@@ -35,8 +35,8 @@
 
     <PackageTags>utility helper middlewear infra crosscutting</PackageTags>
 
-    <AssemblyVersion>2.0.5</AssemblyVersion>
-    <PackageVersion>2.0.5</PackageVersion>
+    <AssemblyVersion>2.0.6</AssemblyVersion>
+    <PackageVersion>2.0.6</PackageVersion>
 
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

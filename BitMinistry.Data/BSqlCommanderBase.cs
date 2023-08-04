@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BitMinistry.Data
 {
@@ -101,6 +102,7 @@ namespace BitMinistry.Data
         /// do not wrap @arguments to apostrophes in TSQL WHERE part 
         ///</summary>
 
+
         public void AddWithValue(string parameterName, object value, ParameterDirection direction = ParameterDirection.Input)
         {
 
@@ -111,7 +113,7 @@ namespace BitMinistry.Data
 
             var p = Activator.CreateInstance<TDbParameter>();
             p.ParameterName = parameterName;
-            p.Value = value;
+            p.Value = CheckCovertUnsignedIfRequired(value);
             p.Direction = direction;
 
 //            var par = new SqlParameter() { ParameterName = parameterName, Value = value, Direction = direction };
@@ -201,6 +203,25 @@ namespace BitMinistry.Data
             return ret;
         }
 
+
+
+        private static object CheckCovertUnsignedIfRequired(object numIn)
+        {
+            var tt = numIn.GetType();
+
+            var umtch = rexUInt.Match(tt.FullName);
+
+            if (!umtch.Success)
+                return numIn;
+
+            var nuTypName = tt.FullName.Replace(umtch.Value, rexUInt.Match(tt.FullName).Value.Replace("UInt", "Int"));
+            var nutyp = Type.GetType(nuTypName);
+
+            var nuob = Convert.ChangeType(numIn, nutyp);
+
+            return nuob;
+        }
+        static Regex rexUInt = new Regex(@"UInt\d{2}");
 
 
     }

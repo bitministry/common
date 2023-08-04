@@ -36,8 +36,8 @@
 
     <PackageTags>mssql utility helper middlewear infra crosscutting</PackageTags>
 
-    <AssemblyVersion>2.0.6</AssemblyVersion>
-    <PackageVersion>2.0.6</PackageVersion>
+    <AssemblyVersion>2.0.7</AssemblyVersion>
+    <PackageVersion>2.0.7</PackageVersion>
 
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

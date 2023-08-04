@@ -31,6 +31,9 @@ namespace BitMinistry.Data
 
         public SqlInfoMessageEventHandler InfoMessage;
 
+
+        public bool TryCatchTheExecute = false;
+
         protected override T ExecuteSql<T>(Func<SqlCommand, T> sqlFunc)
         {
         ExecuteSql:
@@ -39,16 +42,23 @@ namespace BitMinistry.Data
                 Com.Connection.InfoMessage += InfoMessage;
                 Com.Connection.Open();
                 if (Com.Connection.State == ConnectionState.Open)
-                    try
-                    {
-                        Log(Com.CommandText);
+                    if (!TryCatchTheExecute)
                         return sqlFunc(Com);
-                    }
-                    catch (SqlException ex)
-                    {
-                        ex.Data["sql"] = Com.CommandAsSql();
-                        throw;
-                    }
+                    else
+                        try
+                        {
+                            Log(Com.CommandText);
+                            return sqlFunc(Com);
+                        }
+                        catch (SqlException ex)
+                        {
+                            ex.Data["sql"] = Com.CommandAsSql();
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw;
+                        }
             }
 
             goto ExecuteSql;

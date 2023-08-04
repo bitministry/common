@@ -18,7 +18,7 @@ namespace BitMinistry.Data
 
             decimal number;
             
-            if (decimal.TryParse(Convert.ToString(obj), NumberStyles.Any, NumberFormatInfo.InvariantInfo, out number))
+            if (decimal.TryParse(Convert.ToString(obj), NumberStyles.Number, NumberFormatInfo.InvariantInfo, out number))
                 return obj.ToString().Replace(",", ".");
 
             return "'" + obj.ToString().Replace("'", "''") + "'";
