@@ -42,8 +42,6 @@ namespace BitMinistry
                     catch { }
             }
 
-            if (pt == typeof(bool))
-                prop.SetValue(entity, Convert.ToBoolean(value));
             if (pt == typeof(char))
                 prop.SetValue(entity, Convert.ToChar(value));
             if (pt == typeof(int))
@@ -62,6 +60,9 @@ namespace BitMinistry
                 prop.SetValue(entity, Cnv.CDate(value));
             if (pt == typeof(bool))
                 prop.SetValue(entity, Cnv.CBool(value));
+            if (pt == typeof(byte[]))
+                prop.SetValue(entity, (byte[])value);
+
 
         }
 

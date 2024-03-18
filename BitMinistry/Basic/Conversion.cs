@@ -40,6 +40,15 @@ namespace BitMinistry
             return xarr;
         }
 
+        public static Guid? ToGuid(object v)
+        {
+            Guid g;
+            if (Guid.TryParse(CStr(v), out g))
+                return g;
+            else
+                return null;            
+        }
+
         public static bool IsEmail(string email)
         {
             try
@@ -65,11 +74,26 @@ namespace BitMinistry
             return int.TryParse(xsin, out retNum);
         }
 
+        public static bool IsGuid(string candidate)
+        {
+            if (string.IsNullOrEmpty(candidate)) return false;
+            Guid guidOutput;
+            bool isValid = Guid.TryParse(candidate, out guidOutput);
+            return isValid;
+        }
+
+
         public static int CInt(object expression )
         {
             //var nr = CDec(expression);
             var nr = Math.Max(Math.Min(CDec(expression), int.MaxValue), int.MinValue);
             return (int) Math.Round( nr, 0 ) ;
+        }
+        public static Int64 CBigInt(object expression)
+        {
+            //var nr = CDec(expression);
+            var nr = Math.Max(Math.Min(CDec(expression), Int64.MaxValue), Int64.MinValue);
+            return (Int64)Math.Round(nr, 0);
         }
 
         public static int? CNInt(object exp)

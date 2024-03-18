@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json.Linq;
@@ -154,6 +155,15 @@ namespace BitMinistry
             return nvc.AllKeys.ToDictionary(k => k, k => nvc[k]);
         }
 
+        public static string ToImgDataUrl(this byte[] binimg, string ext = "jpeg") => binimg?.Length > 0 ? $"data:image/{ ext };base64,{ Convert.ToBase64String(binimg) }" : "";
+
+        public static byte[] ToArray(this Stream str) {
+            using (var memoryStream = new MemoryStream())
+            {
+                str.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
 
     }
 }
