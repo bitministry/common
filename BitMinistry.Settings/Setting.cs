@@ -10,5 +10,7 @@ namespace BitMinistry.Settings
         public virtual decimal? NumericValue { get; set; }
         public virtual DateTime? DateTimeValue { get; set; }
 
+        public virtual string Comment { get; set; }
+
     }
 }

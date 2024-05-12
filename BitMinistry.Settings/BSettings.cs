@@ -42,7 +42,7 @@ namespace BitMinistry.Settings
         /// BitMinistry.Config.ConnectionStrings["infra"] for default; 
         /// excludeModules - settings where name not like '{moduleName}:%'
         ///</summary>
-        public static void Init ( string connectionName = null, string[] excludeModules = null )
+        public static void Init ( string connectionName = null, string[] excludeModules = null, bool includeComment = false )
         {
 
             if (All == null && ! IgnoreDatabase )
@@ -55,7 +55,7 @@ namespace BitMinistry.Settings
 
                 using (var sql = new BSqlRawCommander(_connectionName ))
                     if (sql.ExecuteScalar("select OBJECT_ID('bm.Setting')") != DBNull.Value)
-                        InitHashSet();
+                        InitHashSet( includeComment );
 
             }
             InitIsCalled = true;
@@ -72,10 +72,10 @@ namespace BitMinistry.Settings
                 sql.ExecuteSqlFileWithGoStatements("create_tables.sql");
         }
 
-        public static void Reset()
+        public static void Reset(bool includeComment = false)
         {
             All = null;
-            Init();
+            Init(includeComment: includeComment );
         }
 
         static string[] _excludeModules;
@@ -97,7 +97,7 @@ namespace BitMinistry.Settings
                     }).ToList();
         }
 
-        private static void InitHashSet()
+        private static void InitHashSet(bool includeComment = false)
         {
             var t = new Setting();
 
@@ -107,19 +107,34 @@ namespace BitMinistry.Settings
 
             using (var sql = new BSqlRawCommander(_connectionName ))
             {
-                All = sql.GetDataRows($"select * from bm.{typeof(Setting).Name} where {where}")
-                    .Select( DataRowToSetting )
+                All = sql.GetDataRows($"select * from bm.{nameof(Setting)} where {where}")
+                    .Select( x=> DataRowToSetting(x, includeComment ) )
                 .ToDictionary(x => x.Name, x => x).ToSafe();
             }                
         }
 
-        static Setting DataRowToSetting(DataRow row) => new Setting
+        static Setting DataRowToSetting(DataRow row )  => new Setting
         {
             Name = row["Name"] as string,
             NTextValue = row["NTextValue"] as string,
             NumericValue = row["NumericValue"] as decimal?,
             DateTimeValue = row["DateTimeValue"] as DateTime?,
         };
+
+        static Setting DataRowToSetting(DataRow row, bool includeComment) {
+
+            var set = new Setting
+            {
+                Name = row["Name"] as string,
+                NTextValue = row["NTextValue"] as string,
+                NumericValue = row["NumericValue"] as decimal?,
+                DateTimeValue = row["DateTimeValue"] as DateTime?,
+            };
+            if (includeComment)
+                set.Comment = row["Comment"] as string; 
+
+            return set;
+        }
 
         public static Setting GetSetting(string id)
         {
@@ -153,7 +168,7 @@ namespace BitMinistry.Settings
         public static void ReFreshSetting(string name)
         {
             using (var sql = new BSqlRawCommander( _connectionName ))
-                All[name] = sql.GetDataRows($"select * from bm.{typeof(Setting).Name} where Name ='{name}'")
+                All[name] = sql.GetDataRows($"select * from bm.{nameof(Setting)} where Name ='{name}'")
                     .Select(DataRowToSetting).FirstOrDefault();
                 
 

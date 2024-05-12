@@ -49,6 +49,8 @@
 
     <!--<EnableComHosting>true</EnableComHosting>-->
 
+    <NoWarn>$(NoWarn);1591</NoWarn>
+
 
   </PropertyGroup>
 

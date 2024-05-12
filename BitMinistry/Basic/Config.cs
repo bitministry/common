@@ -69,7 +69,7 @@ namespace BitMinistry
         public static string DefaultSqlConnectionString {
             get => HardDefaultSqlConnectionString ?? ConnectionStrings[DefaultSqlConnectionName];
             set {
-                _defaultSqlConnectionName = DefaultSqlConnectionName ?? "default";
+                _defaultSqlConnectionName = DefaultSqlConnectionName ?? "main";
                 ConnectionStrings[DefaultSqlConnectionName] = value;  
             }
         }
