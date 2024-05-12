@@ -39,7 +39,7 @@ namespace BitMinistry.Utility
             var linkParser = new Regex(UrlPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
             var domains = linkParser.Matches(text).Cast<Match>()
-                .Select(x => new Uri(httpChk(x.Value)).Host).Distinct().ToList();
+                .Select(x => x.Value).Distinct().ToList();
 
             return domains;
 
