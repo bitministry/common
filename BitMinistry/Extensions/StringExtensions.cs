@@ -257,6 +257,7 @@ namespace BitMinistry
             }
         }
 
+        public static DateTime CDate(this string str) => ToDateTime(str).Value;
         public static DateTime? ToDateTime(this string str )
         {
             return Cnv.CDate(str);
