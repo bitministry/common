@@ -18,7 +18,7 @@ namespace BitMinistry
         }
 
 
-        public object GetRemove(TKey key )
+        public TValue GetRemove(TKey key )
         {
             try
             {

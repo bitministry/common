@@ -97,6 +97,8 @@ namespace BitMinistry
             set => _defaultSqlConnectionName = value;
         }
 
+        public static string DefaultConnectionToNuDb(string nuDatabase) => SqlConnectionString( nuConf: new KeyValuePair<string, string>("database", nuDatabase));
+
         /// <summary>
         /// get a (modified) connectionstring by key; 
         /// modified connection is placed in the dictionary under: [key:property:newvalue], eg [defaultconnection:database:whatnot]
@@ -182,9 +184,9 @@ namespace BitMinistry
 
             }
 
-
-
         }
+
+        public SqlConnectionStringBuilder DefaultConnectionStringBuilder => new SqlConnectionStringBuilder(DefaultSqlConnectionString);
 
     }
 }

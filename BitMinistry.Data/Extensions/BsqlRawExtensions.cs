@@ -97,6 +97,21 @@ namespace BitMinistry.Data
 
 
 
+        public static void ExecutePatchesOf_Go_(this string sqlscript)
+        { 
+            var sqls = sqlscript
+                .Split(new[] { " go ", " GO " }, StringSplitOptions.RemoveEmptyEntries )
+                .Select(x => x.Trim())
+                .Where( x => x.Length > 3 )
+                .ToArray();
+            foreach (var sql in sqls)
+                sql.ExecuteSqlNonQuery();
+
+        }
+        
+        
+
+
     }
 
 }

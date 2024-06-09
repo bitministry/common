@@ -81,7 +81,7 @@ namespace BitMinistry
             return new string(validXmlChars);
         }
 
-        static bool IsValidXmlString(string text)
+        public static bool IsValidXmlString(string text)
         {
             try
             {

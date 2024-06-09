@@ -321,6 +321,20 @@ namespace BitMinistry
             return words;
         }
 
+        public static string ToShortUrl(this string link, int maxArgs = 1)
+        {
+
+            if ( string.IsNullOrEmpty(link) || !Uri.IsWellFormedUriString(link, UriKind.RelativeOrAbsolute)) return null;
+
+            var uri = new Uri(link);
+
+            var localPath = uri.LocalPath.Replace("//", "/")
+                            + (uri.Query.Split('&').Length < maxArgs ? "" : uri.Query); // query only if single variable 
+
+            var url = uri.Scheme + "://" + uri.Host + (localPath.Length > 1 ? localPath : "");
+
+            return url;
+        }
 
     }
 }

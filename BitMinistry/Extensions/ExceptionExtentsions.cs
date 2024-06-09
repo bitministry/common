@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace BitMinistry
 {
@@ -48,6 +49,14 @@ namespace BitMinistry
                 return msg;
             }
         }
+
+        public static string AllMessagesAndStackLine(this Exception ex, string containgingType) => ex.AllMessages() + Environment.NewLine + ex.FirstStackTraceLineContaining( containgingType  );
+
+        public static string FirstStackTraceLineContaining(this Exception ex, string containgingType) => 
+            ex.StackTrace
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                   .Where(line => line.Contains(containgingType))
+                   .FirstOrDefault();
 
 
         public static void Log(this Exception ex, string logName = "Exception", string preliminaryInfo = null)
