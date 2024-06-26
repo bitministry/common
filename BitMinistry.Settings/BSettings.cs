@@ -29,6 +29,8 @@ namespace BitMinistry.Settings
             }
         }
 
+
+
         ///<summary>
         /// use BSettings only as a proxy to BitMinistry.Congig.AppSettings 
         ///</summary>
@@ -175,6 +177,32 @@ namespace BitMinistry.Settings
         }
 
 
+
+
+        ///<summary>
+        /// Get and encrypts password from DB 
+        /// Writes the setting into the database if its not there yet 
+        /// May return null 
+        /// save the setting, with default value, if not exists 
+        ///</summary>
+        public static string GetCryptedPassword(string id, string defaultValue = "")
+        {
+            var ret = GetSetting(id).NTextValue;
+            if (ret == null && !string.IsNullOrEmpty(defaultValue))
+                Save(new Setting()
+                {
+                    Name = id,
+                    NTextValue = AesEncryption.Encrypt( defaultValue)
+                });
+
+            return AesEncryption.Decrypt( ret )?? defaultValue;
+        }
+
+        public static void SetCryptedPassword(string id, string pw) => Save(new Setting()
+            {
+                Name = id,
+                NTextValue = AesEncryption.Encrypt(pw)
+            });
 
         ///<summary>
         /// Fetches settings from database or config file 

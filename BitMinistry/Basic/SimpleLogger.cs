@@ -24,7 +24,7 @@ namespace BitMinistry
         /// Append to textfile according to filename extension: CSV, or plaintext. 
         /// </summary> 
         /// <param name="filename">default is 'log.csv'; c:\SimpleLogger\ is prepended to the names without paths</param>
-        public static void AppendToFile( string message, string filename = null )
+        public static void AppendToFile( string message, string filename = null , bool rethrow = true )
         {
             filename = filename  ?? @"c:\SimpleLogger\log.csv" ;
 
@@ -51,7 +51,8 @@ namespace BitMinistry
             }
             catch (Exception ex)
             {
-                throw new Exception( $"{filename}: {ex.Message}");
+                if (rethrow)
+                    throw new Exception( $"{filename}: {ex.Message}");
 
             }
         }
