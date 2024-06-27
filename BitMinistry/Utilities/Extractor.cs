@@ -33,7 +33,7 @@ namespace BitMinistry.Utility
 
 
         static string _domainPattern;
-        public static string DomainPattern => _domainPattern ?? (_domainPattern = $@"\b(?:[a-zA-Z0-9-]+\.)+(?:{ string.Join("|", _topDomains )})\b" );
+        public static string DomainPattern => _domainPattern ?? (_domainPattern = $@"\b(?:[a-zA-Z0-9-]+\.)+(?:{ string.Join("|", _topDomains )})\b\s" );
 
         public static List<string> ExtractDomains(string text)
         {

@@ -50,8 +50,10 @@ namespace BitMinistry
             }
         }
 
+        public static string AllMessagesAndStackLine<TExSource>(this Exception ex) => ex.AllMessagesAndStackLine(typeof(TExSource).Name);
         public static string AllMessagesAndStackLine(this Exception ex, string containgingType) => ex.AllMessages() + Environment.NewLine + ex.FirstStackTraceLineContaining( containgingType  );
 
+        public static string FirstStackTraceLineContaining<TExSource>(this Exception ex) => ex.FirstStackTraceLineContaining(typeof(TExSource).Name);
         public static string FirstStackTraceLineContaining(this Exception ex, string containgingType) => 
             ex.StackTrace
                 .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
