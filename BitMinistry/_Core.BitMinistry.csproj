@@ -76,6 +76,10 @@
 
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+
 
 
   <Target Name="RenamePack" AfterTargets="Pack">
