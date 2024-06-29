@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 
-namespace BitMinistry.Logger
+namespace BitMinistry
 {
     public class LogItem<TEnum> : ILogItem, IEntity where TEnum : Enum
     {
@@ -28,7 +28,8 @@ namespace BitMinistry.Logger
         public DateTime? Created { get; set; } = DateTime.Now;
 
         private string _assemblyName;
-        public virtual string AssemblyName {
+        public virtual string AssemblyName
+        {
             get
             {
                 return _assemblyName ?? (_assemblyName = AppDomainName);
