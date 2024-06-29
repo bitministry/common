@@ -9,10 +9,10 @@ namespace BitMinistry.Data
 {
     public static class BsqlRawExtensions
     {
-        public static IEnumerable<T> SelectFromSql<T>(this string query, Func<IDataRecord, T> selector, object[,] pars, CommandType type = CommandType.Text ) {
+        public static IEnumerable<T> SelectFromSql<T>(this string query, Func<IDataRecord, T> selector, object[,] pars, CommandType type = CommandType.Text, string connectionName = null) {
 
-            
-            using (var sql = new BSqlRawCommander(comType: type ))
+
+            using (var sql = new BSqlRawCommander(comType: type, connectionName: connectionName))
             {
                 for (int i = 0; i < pars.Length / 2; i++)
                     sql.AddWithValue(pars[i, 0].ToString(), pars[i, 1]);
