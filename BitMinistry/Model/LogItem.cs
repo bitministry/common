@@ -5,7 +5,7 @@ using System.IO;
 
 namespace BitMinistry.Logger
 {
-    public class LogItem : ILogItem, IEntity 
+    public class LogItem<TEnum> : ILogItem, IEntity where TEnum : Enum
     {
         private static string _appDomainName;
 
@@ -15,8 +15,9 @@ namespace BitMinistry.Logger
         public int? IpInt { get; set; }
         public IpLocation IpLocation { get; set; }
 
-        [StringLength(111)]
-        public string Action { get; set; }
+
+        // first item for error (default, for ErrorReport)
+        public virtual TEnum Action { get; set; }
 
         [StringLength(1111)]
         public virtual string Message { get; set; }
@@ -40,40 +41,18 @@ namespace BitMinistry.Logger
         public string CallingType { get; set; }
         public string Culture { get; set; }
         [StringLength(222)]
-        public string Url { get; set; }
+        public virtual string Url { get; set; }
         public int? LogId { get; set; }
 
-//        public object UserId { get; set; }
+
 
         public override string ToString()
         {
-            return $"{Severity} {Action} {Message} - {CallingType} {AssemblyName} {Created}";
+            return $"{Severity} {Message} - {CallingType} {AssemblyName} {Created}";
         }
 
     }
 
-
-    public interface ILogItem
-    {
-        string Action { get; set; }
-        string Message { get; set; }
-        string AdditionalMessage { get; set; }
-        Severity? Severity { get; set; }
-
-        DateTime? Created { get; set; }
-
-        string AssemblyName { get; set; }
-        string CallingType { get; set; }
-        string Culture { get; set; }
-    }
-
-    public enum Severity
-    {
-        Debug,
-        Info,
-        Warn,
-        Error
-    }
 
 
 }

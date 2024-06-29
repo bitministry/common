@@ -5,7 +5,7 @@ namespace BitMinistry
 {
     public interface ILogItem
     {
-        string Action { get; set; }
+        // string Action { get; set; }
         string Message { get; set; }
         string AdditionalMessage { get; set; }
         Severity? Severity { get; set; }
