@@ -1,5 +1,4 @@
-﻿using BitMinistry.Web;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 
@@ -11,9 +10,6 @@ namespace BitMinistry
 
         protected static string AppDomainName
             => _appDomainName ?? (_appDomainName = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name);
-
-        public int? IpInt { get; set; }
-        public IpLocation IpLocation { get; set; }
 
 
         // first item for error (default, for ErrorReport)
