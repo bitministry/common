@@ -65,6 +65,24 @@ namespace BitMinistry.Data
             return retval;
         }
 
+        public static SqlParameter ToSqlParameter(this int[] ids, string parName = "@ids")
+        {
+            DataTable dataTable = new DataTable();
+            dataTable.Columns.Add(new DataColumn("int", typeof(int)));
+
+            foreach (var id in ids ?? new int[0])
+                dataTable.Rows.Add(id);
+
+            return new SqlParameter()
+            {
+                ParameterName = parName,
+                SqlDbType = SqlDbType.Structured,
+                TypeName = "dbo.intarray",
+                Value = dataTable
+            };
+        }
+
+
         public static SqlParameter ToStringArrayParameter(this string[] ina, string parName)
         {
             DataTable dataTable = new DataTable();
