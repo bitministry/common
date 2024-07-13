@@ -83,7 +83,7 @@ namespace BitMinistry.Data
         }
 
 
-        public static SqlParameter ToStringArrayParameter(this string[] ina, string parName)
+        public static SqlParameter ToStringArrayParameter(this string[] ina, string parName = "@ids")
         {
             DataTable dataTable = new DataTable();
             dataTable.Columns.Add(new DataColumn("string", typeof(string)));

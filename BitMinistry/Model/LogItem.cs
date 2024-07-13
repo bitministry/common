@@ -17,13 +17,15 @@ namespace BitMinistry
 
         [StringLength(1111)]
         public virtual string Message { get; set; }
-        [StringLength(3333)]
+        [StringLength(2222)]
         public virtual string AdditionalMessage { get; set; }
         public Severity? Severity { get; set; }
 
         public DateTime? Created { get; set; } = DateTime.Now;
 
         private string _assemblyName;
+
+        [StringLength(33)]
         public virtual string AssemblyName
         {
             get
@@ -35,8 +37,10 @@ namespace BitMinistry
                 _assemblyName = value;
             }
         }
-        public string CallingType { get; set; }
-        public string Culture { get; set; }
+
+        [StringLength(55)]
+        public virtual string CallingType { get; set; }
+        public virtual string Culture { get; set; }
         [StringLength(222)]
         public virtual string Url { get; set; }
         public int? LogId { get; set; }

@@ -1,8 +1,11 @@
-﻿using System;
+﻿using BitMinistry.Utility;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace BitMinistry.Data
 {
@@ -102,7 +105,6 @@ namespace BitMinistry.Data
                 ExecuteNonQuery(q);
 
         }
-
 
 
 

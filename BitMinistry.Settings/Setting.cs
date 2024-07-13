@@ -12,5 +12,7 @@ namespace BitMinistry.Settings
 
         public virtual string Comment { get; set; }
 
+        public override string ToString() => $"{Name} {NTextValue} {NumericValue} {DateTimeValue} {Comment}";
+
     }
 }

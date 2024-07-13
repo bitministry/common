@@ -35,6 +35,12 @@ namespace BitMinistry
             return exp == null ? null : Cnv.CNInt(Regex.Replace(exp, @"[^-+\d]", ""));
         }
 
+        public static long ToLong(this string number)
+        {
+            long i;
+            Int64.TryParse(number, out i);
+            return i;
+        }
 
         public static int ToInt(this string number )
         {
@@ -200,6 +206,16 @@ namespace BitMinistry
 
         public static bool IsGuid(this string candidate) => Cnv.IsGuid(candidate);
 
+        public static bool IsAbsoluteUrl(this string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult))
+            {
+                return uriResult.IsAbsoluteUri;
+            }
+
+            return false;
+        }
+
         public static string HttpChk( this string str )
         {
             if (IsNullOrEmpty(str)) return str;
@@ -213,6 +229,22 @@ namespace BitMinistry
 
             return str;
         }
+
+
+        public static string CleanUrl(this string str)
+        {
+
+            if (Uri.IsWellFormedUriString(str, UriKind.Absolute))
+            {
+                var uri = new Uri(str, UriKind.RelativeOrAbsolute);
+                return uri.Authority + uri.PathAndQuery.TrimEnd('/');
+            }
+            if (Uri.IsWellFormedUriString(str, UriKind.Relative))
+                return str.TrimEnd('/');
+
+            return null;
+        }
+
 
         public static bool IsDate(this string value)
         {
@@ -336,6 +368,11 @@ namespace BitMinistry
 
             return url;
         }
+
+        public static string StringJoin(this string[] strArr, string separator) => strArr?.Length > 0 ? string.Join(",", strArr) : null;
+
+
+
 
     }
 }

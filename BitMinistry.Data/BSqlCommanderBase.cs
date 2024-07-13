@@ -1,13 +1,16 @@
-﻿using System;
+﻿using BitMinistry.Utility;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace BitMinistry.Data
 {
-    public abstract class BSqlCommanderBase <TDbCommand, TDbConnection, TDbParameter> : IDisposable 
+    public abstract class BSqlCommanderBase <TDbCommand, TDbConnection, TDbParameter> : BSqlCommanderUtil, IDisposable
         where TDbCommand : IDbCommand
         where TDbConnection : IDbConnection 
         where TDbParameter : IDbDataParameter 
@@ -41,8 +44,13 @@ namespace BitMinistry.Data
 
 
         string _dbSchema;
-        protected string inSchema(string entityName) => $"{ (_dbSchema != null ? _dbSchema + "." : "") }{entityName}";
-        public void SetDbSchema(string schema) => _dbSchema = schema;
+        public string DbSchema => _dbSchema == null ? null : (_dbSchema + ".");
+
+        public string InSchema(string entityName) => DbSchema  + entityName;
+        public void SetDbSchema(string schema) {
+            if (schema != null)
+                _dbSchema = schema.TrimEnd('.');
+        }
 
 
 
@@ -149,13 +157,13 @@ namespace BitMinistry.Data
 
             if (avoidDuplicate)
             {
-                query = $"select count(*) from {inSchema(tableName)} WHERE " + string.Join(" AND ", parameters.Keys.Select(x => $"{x} = @{x}"));
+                query = $"select count(*) from {InSchema(tableName)} WHERE " + string.Join(" AND ", parameters.Keys.Select(x => $"{x} = @{x}"));
 
                 if (ExecuteScalar(query) as int? > 0)
                     return false;
             }
 
-            query = $"INSERT INTO {inSchema(tableName)} ([{string.Join("],[", parameters.Keys)}]) VALUES (@{string.Join(",@", parameters.Keys)})";
+            query = $"INSERT INTO {InSchema(tableName)} ([{string.Join("],[", parameters.Keys)}]) VALUES (@{string.Join(",@", parameters.Keys)})";
 
             ExecuteNonQuery(query);
             Com.Parameters.Clear();
@@ -186,7 +194,7 @@ namespace BitMinistry.Data
             if (string.IsNullOrEmpty(updateWhere))
                 throw new ArgumentNullException(nameof(updateWhere));
 
-            var query = $"UPDATE {inSchema(tableName)  } "+ 
+            var query = $"UPDATE {InSchema(tableName)  } "+ 
                         ( (Com is SqlCommand) ? "WITH ( ROWLOCK ) ": "" ) +
                         $"SET {string.Join(", ", parameters.Select(x => $"[{x.Key}]=@{x.Key}"))} " +
                         "WHERE " + updateWhere;
@@ -205,7 +213,56 @@ namespace BitMinistry.Data
 
 
 
-        private static object CheckCovertUnsignedIfRequired(object numIn)
+
+
+
+    }
+
+
+    public class BSqlCommanderUtil
+    {
+
+        public PropertyInfo[] GetValidProps<T>() where T : ISqlQueryable
+            => GetValidProps(typeof(T)) ;
+
+        public PropertyInfo[] GetValidProps(Type entType)
+        {
+            var props = entType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            if (entType.IsValueType)
+                props = entType.GetFields().Select(x => new FieldToPropInfo(x)).ToArray();
+
+            return
+                props
+                    .Where(
+                        x =>
+                            x.CanWrite && x.GetCustomAttribute<BSqlIgnoreAttribute>() == null && IsValidProp(x.PropertyType))
+                    .ToArray();
+        }
+
+        public bool IsValidProp(Type prop)
+        {
+            prop = Nullable.GetUnderlyingType(prop) ?? prop;
+
+            return prop == typeof(string) ||
+                            prop == typeof(int) ||
+                            prop == typeof(Guid) ||
+                            prop == typeof(DateTime) ||
+                            prop == typeof(long) ||
+                            prop == typeof(bool) ||
+                            prop == typeof(float) ||
+                            prop.IsEnum ||
+                            prop == typeof(Int16) ||
+                            prop == typeof(decimal) ||
+                            prop == typeof(double) ||
+                            prop == typeof(char) ||
+                            prop == typeof(byte[]);
+
+        }
+
+            
+
+
+        public object CheckCovertUnsignedIfRequired(object numIn)
         {
             var tt = numIn.GetType();
 
@@ -221,10 +278,31 @@ namespace BitMinistry.Data
 
             return nuob;
         }
+
         static Regex rexUInt = new Regex(@"UInt\d{2}");
 
 
+        public IDictionary<string, object> ValuesOfProps<TEntity>(IEnumerable<PropertyInfo> props, TEntity obj) where TEntity : ISqlQueryable =>
+            props.ToDictionary(
+                    x => x.Name,
+                    y =>
+                    {
+                        var val = y.PropertySqlVal(obj);
+
+                        if (val == null) return null;
+
+                        var strLenCondition = y.GetCustomAttribute<StringLengthAttribute>();
+                        if (strLenCondition != null)
+                            return val.ToString().MaxLength(strLenCondition.MaximumLength);
+
+                        return val;
+                    });
+
+
     }
+
+
+
 
 
 }
