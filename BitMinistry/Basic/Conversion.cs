@@ -106,14 +106,16 @@ namespace BitMinistry
         /// <summary>
         /// return format with dot  -123.45
         /// </summary> 
-        public static string SweepDecimal( string exp)
+        public static string SweepDecimal( string sin)
         {
-            return (exp[0] == '-' ? "-" : "")  // negative / postitive 
-                + (Regex.IsMatch(exp, @"\.")
-                    ? Regex.Replace(exp, @"[^0-9\.]", "")
-                    : (Regex.Matches(exp, @",").Count > 1 
-                        ? Regex.Replace(exp, "[^0-9]", "")
-                        : Regex.Replace(exp, "[^0-9,]", "").Replace(',', '.') ));
+            if (string.IsNullOrEmpty(sin)) return sin;
+
+            return (sin[0] == '-' ? "-" : "")  // negative / postitive 
+                + (Regex.IsMatch(sin, @"\.")
+                    ? Regex.Replace(sin, @"[^0-9\.]", "")
+                    : (Regex.Matches(sin, @",").Count > 1 
+                        ? Regex.Replace(sin, "[^0-9]", "")
+                        : Regex.Replace(sin, "[^0-9,]", "").Replace(',', '.') ));
         }
 
         public static decimal CDec(object expression, string cleanExp = null  )

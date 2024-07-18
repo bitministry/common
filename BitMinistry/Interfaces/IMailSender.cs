@@ -6,5 +6,6 @@ namespace BitMinistry
     public interface IMailSender
     {
         Task SendAsync(MailMessage message);
+        string SmtpUser { get; }
     }
 }
