@@ -44,12 +44,13 @@ namespace BitMinistry.Settings
         /// BitMinistry.Config.ConnectionStrings["infra"] for default; 
         /// excludeModules - settings where name not like '{moduleName}:%'
         ///</summary>
-        public static void Init ( string connectionName = null, string[] excludeModules = null, bool includeComment = false )
+        public static void Init ( string connectionName = null, string[] excludeModules = null, bool includeComment = false, string[] includeModules = null)
         {
 
             if (All == null && ! IgnoreDatabase )
             {
                 _excludeModules = excludeModules;
+                _includeModules = includeModules;
 
                 _connectionName = connectionName ?? _connectionName ??
                     (Config.ConnectionStrings.ContainsKey("infra") ? "infra" : "main") ;
@@ -81,6 +82,7 @@ namespace BitMinistry.Settings
         }
 
         static string[] _excludeModules;
+        private static string[] _includeModules;
 
         public static bool InitIsCalled { get; private set; }
         
@@ -106,6 +108,7 @@ namespace BitMinistry.Settings
             var where = $"({nameof(t.NTextValue)} IS NOT NULL OR {nameof(t.NumericValue)} IS NOT NULL OR {nameof(t.DateTimeValue)} IS NOT NULL) ";
 
             where += _excludeModules?.Length > 0 ? $" AND {nameof(t.Name)} not like '{string.Join($":%' and {nameof(t.Name)} not like '", _excludeModules)}:%'" : "";
+            where += _includeModules?.Length > 0 ? $" AND ( {nameof(t.Name)} like '{string.Join($":%' or {nameof(t.Name)} like '", _includeModules)}:%')" : "";
 
             using (var sql = new BSqlRawCommander(_connectionName ))
             {
