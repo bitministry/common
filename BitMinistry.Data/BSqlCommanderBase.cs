@@ -222,8 +222,8 @@ namespace BitMinistry.Data
     public class BSqlCommanderUtil
     {
 
-        public PropertyInfo[] GetValidProps<T>() where T : ISqlQueryable
-            => GetValidProps(typeof(T)) ;
+        public PropertyInfo[] GetValidProps<TSqlQueryable>() where TSqlQueryable : ISqlQueryable
+            => GetValidProps(typeof(TSqlQueryable)) ;
 
         public PropertyInfo[] GetValidProps(Type entType)
         {
@@ -297,6 +297,59 @@ namespace BitMinistry.Data
 
                         return val;
                     });
+
+        public TSqlQueryable LoadEntityWithPropertyValuesFromObject<TSqlQueryable>(IDataRecord dataRec, PropertyInfo[] orderedProperties) where TSqlQueryable : ISqlQueryable
+        {
+            var entity = Activator.CreateInstance<TSqlQueryable>();
+            for (int i = 0; i < orderedProperties.Length; i++)
+                if (dataRec.GetValue(i) != DBNull.Value)
+                    SetPropValue(entity, orderedProperties[i], dataRec.GetValue(i));
+            //                    orderedProperties[i].SetValue(entity, dataRec.GetValue(i));
+
+            return entity;
+        }
+
+
+        public TSqlQueryable LoadEntityWithPropertyValuesFromDataRow<TSqlQueryable>(DataRow row) where TSqlQueryable : ISqlQueryable
+        {
+            var entity = Activator.CreateInstance<TSqlQueryable>();
+            var tt = typeof(TSqlQueryable);
+
+            foreach (DataColumn col in row.Table.Columns)
+            {
+                var prop = tt.GetProperty(col.ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                if (prop != null )
+                    SetPropValue(entity, prop, row[col.ColumnName]);
+
+                continue;
+
+                if (row[col.ColumnName] == DBNull.Value) continue;
+
+                var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+                if (propType.IsEnum)
+                    prop.SetValue(entity, Enum.Parse(propType, row[col.ColumnName].CStr()));
+                else
+                    prop.SetValue(entity, row[col.ColumnName]);
+            }
+
+
+            return entity;
+        }
+
+
+        public void SetPropValue<TEntity>(TEntity entity, PropertyInfo prop, object value)
+        {
+            if (value == DBNull.Value) return;
+
+            var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+            if (propType.IsEnum)
+                prop.SetValue(entity, Enum.Parse(propType, value.CStr()));
+            else
+                prop.SetValue(entity, value);
+        }
 
 
     }

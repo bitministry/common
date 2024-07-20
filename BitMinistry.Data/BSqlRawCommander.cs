@@ -106,10 +106,11 @@ namespace BitMinistry.Data
 
         }
 
+        #region helpers 
 
+    
 
-
-
+        #endregion
 
     }
 
