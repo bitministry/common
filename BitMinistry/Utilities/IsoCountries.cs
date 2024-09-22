@@ -1,33 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BitMinistry.Utility
 {
 
 
-    public static class ISO3166
+    public static class IsoCountries
     {
         /// <summary>
         /// Obtain ISO3166-1 Country based on its alpha3 code.
         /// </summary>
         /// <param name="alpha3"></param>
         /// <returns></returns>
-        public static ISO3166Country FromAlpha3(string alpha3)
-        {
-            return GetCollection().FirstOrDefault(p => p.Alpha3 == alpha3);
-        }
+        public static ISO3166Country FromAlpha3(string alpha3) => Alpha3[alpha3];
 
-        public static ISO3166Country FromAlpha2(string alpha2)
-        {
-            return GetCollection().FirstOrDefault(p => p.Alpha2 == alpha2);
-        }
+        public static ISO3166Country FromAlpha2(string alpha2) => Alpha2[alpha2];
 
         #region Build Collection
 
-        public static IEnumerable<ISO3166Country> GetCollection()
-        {
+
+        static SafeDictionary<string, ISO3166Country> _alph2;
+        public static SafeDictionary<string, ISO3166Country> Alpha2 => _alph2 ?? (_alph2 = All().ToDictionary(x => x.Alpha2, y => y).ToSafe());
+
+        static SafeDictionary<string, ISO3166Country> _alph3;
+        public static SafeDictionary<string, ISO3166Country> Alpha3 => _alph3 ?? (_alph3 = All().ToDictionary(x => x.Alpha3, y => y).ToSafe());
+
+        static ISO3166Country[] All() =>
             // This collection built from Wikipedia entry on ISO3166-1 on 9th Feb 2016
-            return new[]
+            new[]
             {
                 new ISO3166Country("Afghanistan", "AF", "AFG", 4, new[] {"93"}),
                 new ISO3166Country("Åland Islands", "AX", "ALA", 248, new[] {"358"}),
@@ -146,11 +147,11 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Kazakhstan", "KZ", "KAZ", 398, new[] {"7"}),
                 new ISO3166Country("Kenya", "KE", "KEN", 404, new[] {"254"}),
                 new ISO3166Country("Kiribati", "KI", "KIR", 296, new[] {"686"}),
-                new ISO3166Country("Korea (Democratic People's Republic of)", "KP", "PRK", 408, new[] {"850"}),
-                new ISO3166Country("Korea (Republic of)", "KR", "KOR", 410, new[] {"82"}),
+                new ISO3166Country("North-Korea", "KP", "PRK", 408, new[] {"850"}),
+                new ISO3166Country("South-Korea", "KR", "KOR", 410, new[] {"82"}),
                 new ISO3166Country("Kuwait", "KW", "KWT", 414, new[] {"965"}),
                 new ISO3166Country("Kyrgyzstan", "KG", "KGZ", 417, new[] {"996"}),
-                new ISO3166Country("Lao People's Democratic Republic", "LA", "LAO", 418, new[] {"856"}),
+                new ISO3166Country("Laos", "LA", "LAO", 418, new[] {"856"}),
                 new ISO3166Country("Latvia", "LV", "LVA", 428, new[] {"371"}),
                 new ISO3166Country("Lebanon", "LB", "LBN", 422, new[] {"961"}),
                 new ISO3166Country("Lesotho", "LS", "LSO", 426, new[] {"266"}),
@@ -160,7 +161,7 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Lithuania", "LT", "LTU", 440, new[] {"370"}),
                 new ISO3166Country("Luxembourg", "LU", "LUX", 442, new[] {"352"}),
                 new ISO3166Country("Macao", "MO", "MAC", 446, new[] {"853"}),
-                new ISO3166Country("Macedonia (the former Yugoslav Republic of)", "MK", "MKD", 807, new[] {"389"}),
+                new ISO3166Country("Macedonia", "MK", "MKD", 807, new[] {"389"}),
                 new ISO3166Country("Madagascar", "MG", "MDG", 450, new[] {"261"}),
                 new ISO3166Country("Malawi", "MW", "MWI", 454, new[] {"265"}),
                 new ISO3166Country("Malaysia", "MY", "MYS", 458, new[] {"60"}),
@@ -173,7 +174,7 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Mauritius", "MU", "MUS", 480, new[] {"230"}),
                 new ISO3166Country("Mayotte", "YT", "MYT", 175, new[] {"262"}),
                 new ISO3166Country("Mexico", "MX", "MEX", 484, new[] {"52"}),
-                new ISO3166Country("Micronesia (Federated States of)", "FM", "FSM", 583, new[] {"691"}),
+                new ISO3166Country("Micronesia", "FM", "FSM", 583, new[] {"691"}),
                 new ISO3166Country("Moldova (Republic of)", "MD", "MDA", 498, new[] {"373"}),
                 new ISO3166Country("Monaco", "MC", "MCO", 492, new[] {"377"}),
                 new ISO3166Country("Mongolia", "MN", "MNG", 496, new[] {"976"}),
@@ -214,7 +215,7 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Russian Federation", "RU", "RUS", 643, new[] {"7"}),
                 new ISO3166Country("Rwanda", "RW", "RWA", 646, new[] {"250"}),
                 new ISO3166Country("Saint Barthélemy", "BL", "BLM", 652, new[] {"590"}),
-                new ISO3166Country("Saint Helena, Ascension and Tristan da Cunha", "SH", "SHN", 654, new[] {"290"}),
+                new ISO3166Country("Saint Helena", "SH", "SHN", 654, new[] {"290"}),
                 new ISO3166Country("Saint Kitts and Nevis", "KN", "KNA", 659, new[] {"1 869"}),
                 new ISO3166Country("Saint Lucia", "LC", "LCA", 662, new[] {"1 758"}),
                 new ISO3166Country("Saint Martin (French part)", "MF", "MAF", 663, new[] {"590"}),
@@ -235,7 +236,7 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Solomon Islands", "SB", "SLB", 90, new[] {"677"}),
                 new ISO3166Country("Somalia", "SO", "SOM", 706, new[] {"252"}),
                 new ISO3166Country("South Africa", "ZA", "ZAF", 710, new[] {"27"}),
-                new ISO3166Country("South Georgia and the South Sandwich Islands", "GS", "SGS", 239, new[] {"500"}),
+                new ISO3166Country("South Georgia", "GS", "SGS", 239, new[] {"500"}),
                 new ISO3166Country("South Sudan", "SS", "SSD", 728, new[] {"211"}),
                 new ISO3166Country("Spain", "ES", "ESP", 724, new[] {"34"}),
                 new ISO3166Country("Sri Lanka", "LK", "LKA", 144, new[] {"94"}),
@@ -246,9 +247,9 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Sweden", "SE", "SWE", 752, new[] {"46"}),
                 new ISO3166Country("Switzerland", "CH", "CHE", 756, new[] {"41"}),
                 new ISO3166Country("Syrian Arab Republic", "SY", "SYR", 760, new[] {"963"}),
-                new ISO3166Country("Taiwan, Province of China[a]", "TW", "TWN", 158, new[] {"886"}),
+                new ISO3166Country("Taiwan", "TW", "TWN", 158, new[] {"886"}),
                 new ISO3166Country("Tajikistan", "TJ", "TJK", 762, new[] {"992"}),
-                new ISO3166Country("Tanzania, United Republic of", "TZ", "TZA", 834, new[] {"255"}),
+                new ISO3166Country("Tanzania", "TZ", "TZA", 834, new[] {"255"}),
                 new ISO3166Country("Thailand", "TH", "THA", 764, new[] {"66"}),
                 new ISO3166Country("Timor-Leste", "TL", "TLS", 626, new[] {"670"}),
                 new ISO3166Country("Togo", "TG", "TGO", 768, new[] {"228"}),
@@ -263,14 +264,13 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Uganda", "UG", "UGA", 800, new[] {"256"}),
                 new ISO3166Country("Ukraine", "UA", "UKR", 804, new[] {"380"}),
                 new ISO3166Country("United Arab Emirates", "AE", "ARE", 784, new[] {"971"}),
-                new ISO3166Country("United Kingdom of Great Britain and Northern Ireland", "GB", "GBR", 826,
-                    new[] {"44"}),
+                new ISO3166Country("United Kingdom", "GB", "GBR", 826, new[] {"44"}),
                 new ISO3166Country("United States of America", "US", "USA", 840, new[] {"1"}),
                 new ISO3166Country("United States Minor Outlying Islands", "UM", "UMI", 581),
                 new ISO3166Country("Uruguay", "UY", "URY", 858, new[] {"598"}),
                 new ISO3166Country("Uzbekistan", "UZ", "UZB", 860, new[] {"998"}),
                 new ISO3166Country("Vanuatu", "VU", "VUT", 548, new[] {"678"}),
-                new ISO3166Country("Venezuela (Bolivarian Republic of)", "VE", "VEN", 862, new[] {"58"}),
+                new ISO3166Country("Venezuela", "VE", "VEN", 862, new[] {"58"}),
                 new ISO3166Country("Viet Nam", "VN", "VNM", 704, new[] {"84"}),
                 new ISO3166Country("Virgin Islands (British)", "VG", "VGB", 92, new[] {"1 284"}),
                 new ISO3166Country("Virgin Islands (U.S.)", "VI", "VIR", 850, new[] {"1 340"}),
@@ -280,7 +280,7 @@ namespace BitMinistry.Utility
                 new ISO3166Country("Zambia", "ZM", "ZMB", 894, new[] {"260"}),
                 new ISO3166Country("Zimbabwe", "ZW", "ZWE", 716, new[] {"263"})
             };
-        }
+        
 
         #endregion
     }

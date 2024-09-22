@@ -230,9 +230,9 @@ namespace BitMinistry
             return str;
         }
 
-
         public static string CleanUrl(this string str)
         {
+            
 
             if (Uri.IsWellFormedUriString(str, UriKind.Absolute))
             {

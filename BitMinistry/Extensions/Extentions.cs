@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -164,6 +166,138 @@ namespace BitMinistry
                 return memoryStream.ToArray();
             }
         }
+
+
+
+        public static byte[] ResizeImage(this byte[] imageData, int maxWidth, int maxHeight)
+        {
+            using (MemoryStream originalStream = new MemoryStream(imageData))
+            using (Image originalImage = Image.FromStream(originalStream))
+            {
+                int newWidth;
+                int newHeight;
+
+                // Calculate new dimensions to maintain aspect ratio
+                double aspectRatio = (double)originalImage.Width / originalImage.Height;
+                if (aspectRatio <= 1 && originalImage.Height > maxHeight)
+                {
+                    newHeight = maxHeight;
+                    newWidth = (int)(newHeight * aspectRatio);
+                }
+                else if (aspectRatio > 1 && originalImage.Width > maxWidth)
+                {
+                    newWidth = maxWidth;
+                    newHeight = (int)(newWidth / aspectRatio);
+                }
+                else
+                {
+                    newWidth = originalImage.Width;
+                    newHeight = originalImage.Height;
+                }
+
+                // Create a new Bitmap with the resized dimensions
+                using (Bitmap resizedImage = new Bitmap(newWidth, newHeight))
+                {
+                    using (Graphics graphics = Graphics.FromImage(resizedImage))
+                    {
+                        graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+                        // Draw the original image onto the resized image
+                        graphics.DrawImage(originalImage, 0, 0, newWidth, newHeight);
+                    }
+
+                    // Save the resized image to a new byte array
+                    using (MemoryStream resizedStream = new MemoryStream())
+                    {
+                        resizedImage.Save(resizedStream, ImageFormat.Jpeg);
+                        return resizedStream.ToArray();
+                    }
+                }
+            }
+        }
+
+
+        public static byte[] ResizeAndCrop(this byte[] imageData, int maxWidth, int maxHeight)
+        {
+            using (MemoryStream originalStream = new MemoryStream(imageData))
+            using (Image originalImage = Image.FromStream(originalStream))
+            {
+                if (maxWidth >= originalImage.Width && maxHeight >= originalImage.Height) 
+                    return imageData;
+
+                if (maxWidth > originalImage.Width) maxWidth = originalImage.Width;
+                if (maxHeight > originalImage.Height) maxHeight = originalImage.Height;
+
+                // Step 1: Resize the image to ensure it fits within the bounding box (maxWidth x maxHeight)
+                double aspectRatio = (double)originalImage.Width / originalImage.Height;
+                int resizeWidth, resizeHeight;
+
+                // Resize while maintaining aspect ratio
+                if (originalImage.Width > originalImage.Height) // Landscape or square
+                {
+                    resizeWidth = maxWidth;
+                    resizeHeight = (int)(resizeWidth / aspectRatio);
+                    if (resizeHeight < maxHeight)
+                    {
+                        resizeHeight = maxHeight;
+                        resizeWidth = (int)(resizeHeight * aspectRatio);
+                    }
+                }
+                else // Portrait
+                {
+                    resizeHeight = maxHeight;
+                    resizeWidth = (int)(resizeHeight * aspectRatio);
+                    if (resizeWidth < maxWidth)
+                    {
+                        resizeWidth = maxWidth;
+                        resizeHeight = (int)(resizeWidth / aspectRatio);
+                    }
+                }
+
+                // Create a resized image
+                using (Bitmap resizedImage = new Bitmap(resizeWidth, resizeHeight))
+                {
+                    using (Graphics graphics = Graphics.FromImage(resizedImage))
+                    {
+                        graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+                        graphics.DrawImage(originalImage, 0, 0, resizeWidth, resizeHeight);
+                    }
+
+                    // Step 2: Center crop the resized image
+                    int cropX = (resizeWidth - maxWidth) / 2;
+                    int cropY = (resizeHeight - maxHeight) / 2;
+
+                    using (Bitmap finalImage = new Bitmap(maxWidth, maxHeight))
+                    {
+                        using (Graphics graphics = Graphics.FromImage(finalImage))
+                        {
+                            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+                            // Draw the cropped area from the resized image onto the final image
+                            graphics.DrawImage(resizedImage, new Rectangle(0, 0, maxWidth, maxHeight),
+                                               new Rectangle(cropX, cropY, maxWidth, maxHeight),
+                                               GraphicsUnit.Pixel);
+                        }
+
+                        // Step 3: Save the final image to a memory stream and return the byte array
+                        using (MemoryStream resizedStream = new MemoryStream())
+                        {
+                            finalImage.Save(resizedStream, ImageFormat.Jpeg); // Adjust format as needed
+                            return resizedStream.ToArray();
+                        }
+                    }
+                }
+            }
+        }
+
+
 
     }
 }
