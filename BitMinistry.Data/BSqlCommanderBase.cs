@@ -71,6 +71,11 @@ namespace BitMinistry.Data
 
         public int? StoredProcedureReturnValue => GetParameterValue("returnInt") as int?;
 
+        public void AddParameters(IDictionary<string, object> pars)
+        {
+            foreach(var par in pars)
+                AddWithValue(par.Key, par.Value);
+        }
 
         public void AddParameters(object[,] pars)
         {
