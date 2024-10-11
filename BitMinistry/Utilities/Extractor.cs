@@ -32,37 +32,29 @@ namespace BitMinistry.Utility
         }
 
 
-        static string _domainPattern;
-        public static string DomainPattern => _domainPattern ?? (_domainPattern = $@"\b(?:[a-zA-Z0-9-]+\.)+(?:{ string.Join("|", _topDomains )})\b\s" );
+        static Regex domainRegex = new Regex(@"\b([a-zA-Z0-9-]+\.)+([a-zA-Z]{2,})\b");
 
         public static List<string> ExtractDomains(string text)
         {
 
-            var linkParser = new Regex(DomainPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
-            var domains = linkParser.Matches(text).Cast<Match>()
-                .Select(x => x.Value).Distinct().ToList();
+            var domains = domainRegex.Matches(text)
+                .Cast<Match>()
+                .Distinct()
+                .Where(x => {
+                    string tld = x.Groups[2].Value.ToUpper();
+                    return _topDomains.Contains( tld );
+                })
+                .Select(x => x.Value.Trim())
+                .ToList();
 
             return domains;
 
-            string httpChk(string str)
-            {
-                if (string.IsNullOrEmpty(str)) return str;
-
-                str = str.StartsWith("http")
-                    ? str
-                    : ("http://" + str);
-
-                while (str.Contains("///"))
-                    str = str.Replace("///", "//");
-
-                return str;
-            }
+ 
 
         }
 
 
-        static string[] _topDomains = new[] {
+        static HashSet<string> _topDomains = new HashSet<string>( new[] {
             "AAA",
             "AARP",
             "ABB",
@@ -1360,9 +1352,7 @@ namespace BitMinistry.Utility
             "YOUTUBE",
             "YT",
             "YUN",
-        };
-
-
+        });
 
 
 
