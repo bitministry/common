@@ -143,7 +143,6 @@ namespace BitMinistry.Settings
 
         public static Setting GetSetting(string id)
         {
-            if (!InitIsCalled) Init();
             var setting = All?[id];
 
             if (setting == null)
