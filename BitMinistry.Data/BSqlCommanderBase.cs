@@ -1,12 +1,8 @@
-﻿using BitMinistry.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace BitMinistry.Data
 {
@@ -52,10 +48,12 @@ namespace BitMinistry.Data
                 _dbSchema = schema.TrimEnd('.');
         }
 
-
-
-
-        public Action<string> Log = s => { };
+        Action<string> _log;
+        public Action<string> Log
+        {
+            get => _log ?? (_log = (x) => { });
+            set => _log = value;
+        }
 
         public CommandType DefaultCommandType = CommandType.Text;
 
@@ -123,6 +121,9 @@ namespace BitMinistry.Data
                 || value is float && float.IsNaN((float)value)
                 || value is double && double.IsNaN((double)value)
                 ) value = DBNull.Value;
+            else
+                if (value.GetType().IsEnum)
+                    value = value.ToString();
 
             var p = Activator.CreateInstance<TDbParameter>();
             p.ParameterName = parameterName;
@@ -170,7 +171,7 @@ namespace BitMinistry.Data
 
             query = $"INSERT INTO {InSchema(tableName)} ([{string.Join("],[", parameters.Keys)}]) VALUES (@{string.Join(",@", parameters.Keys)})";
 
-            ExecuteNonQuery(query);
+            var res = ExecuteNonQuery(query);
             Com.Parameters.Clear();
             return true;
         }
@@ -219,142 +220,6 @@ namespace BitMinistry.Data
 
 
 
-
-
-    }
-
-
-    public class BSqlCommanderUtil
-    {
-
-        public PropertyInfo[] GetValidProps<TSqlQueryable>() where TSqlQueryable : ISqlQueryable
-            => GetValidProps(typeof(TSqlQueryable)) ;
-
-        public PropertyInfo[] GetValidProps(Type entType)
-        {
-            var props = entType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            if (entType.IsValueType)
-                props = entType.GetFields().Select(x => new FieldToPropInfo(x)).ToArray();
-
-            return
-                props
-                    .Where(
-                        x =>
-                            x.CanWrite && x.GetCustomAttribute<BSqlIgnoreAttribute>() == null && IsValidProp(x.PropertyType))
-                    .ToArray();
-        }
-
-        public bool IsValidProp(Type prop)
-        {
-            prop = Nullable.GetUnderlyingType(prop) ?? prop;
-
-            return prop == typeof(string) ||
-                            prop == typeof(int) ||
-                            prop == typeof(Guid) ||
-                            prop == typeof(DateTime) ||
-                            prop == typeof(long) ||
-                            prop == typeof(bool) ||
-                            prop == typeof(float) ||
-                            prop.IsEnum ||
-                            prop == typeof(Int16) ||
-                            prop == typeof(decimal) ||
-                            prop == typeof(double) ||
-                            prop == typeof(char) ||
-                            prop == typeof(byte[]);
-
-        }
-
-            
-
-
-        public object CheckCovertUnsignedIfRequired(object numIn)
-        {
-            var tt = numIn.GetType();
-
-            var umtch = rexUInt.Match(tt.FullName);
-
-            if (!umtch.Success)
-                return numIn;
-
-            var nuTypName = tt.FullName.Replace(umtch.Value, rexUInt.Match(tt.FullName).Value.Replace("UInt", "Int"));
-            var nutyp = Type.GetType(nuTypName);
-
-            var nuob = Convert.ChangeType(numIn, nutyp);
-
-            return nuob;
-        }
-
-        static Regex rexUInt = new Regex(@"UInt\d{2}");
-
-
-        public IDictionary<string, object> ValuesOfProps<TEntity>(IEnumerable<PropertyInfo> props, TEntity obj) where TEntity : ISqlQueryable =>
-            props.ToDictionary(
-                    x => x.Name,
-                    y =>
-                    {
-                        var val = y.PropertySqlVal(obj);
-
-                        if (val == null) return null;
-
-                        var strLenCondition = y.GetCustomAttribute<StringLengthAttribute>();
-                        if (strLenCondition != null)
-                            return val.ToString().MaxLength(strLenCondition.MaximumLength);
-
-                        return val;
-                    });
-
-        public TSqlQueryable LoadEntityWithPropertyValuesFromObject<TSqlQueryable>(IDataRecord dataRec, PropertyInfo[] orderedProperties) where TSqlQueryable : ISqlQueryable
-        {
-            var entity = Activator.CreateInstance<TSqlQueryable>();
-            for (int i = 0; i < orderedProperties.Length; i++)
-                if (dataRec.GetValue(i) != DBNull.Value)
-                    SetPropValue(entity, orderedProperties[i], dataRec.GetValue(i));
-            //                    orderedProperties[i].SetValue(entity, dataRec.GetValue(i));
-
-            return entity;
-        }
-
-
-        public TSqlQueryable LoadEntityWithPropertyValuesFromDataRow<TSqlQueryable>(DataRow row) where TSqlQueryable : ISqlQueryable
-        {
-            var entity = Activator.CreateInstance<TSqlQueryable>();
-            var tt = typeof(TSqlQueryable);
-
-            foreach (DataColumn col in row.Table.Columns)
-            {
-                var prop = tt.GetProperty(col.ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-                if (prop != null )
-                    SetPropValue(entity, prop, row[col.ColumnName]);
-
-                continue;
-
-                if (row[col.ColumnName] == DBNull.Value) continue;
-
-                var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-
-                if (propType.IsEnum)
-                    prop.SetValue(entity, Enum.Parse(propType, row[col.ColumnName].CStr()));
-                else
-                    prop.SetValue(entity, row[col.ColumnName]);
-            }
-
-
-            return entity;
-        }
-
-
-        public void SetPropValue<TEntity>(TEntity entity, PropertyInfo prop, object value)
-        {
-            if (value == DBNull.Value) return;
-
-            var propType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-
-            if (propType.IsEnum)
-                prop.SetValue(entity, Enum.Parse(propType, value.CStr()));
-            else
-                prop.SetValue(entity, value);
-        }
 
 
     }
