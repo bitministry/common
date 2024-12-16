@@ -114,7 +114,7 @@ namespace BitMinistry.Settings
             {
                 All = sql.GetDataRows($"select * from bm.{nameof(Setting)} where {where}")
                     .Select( x=> DataRowToSetting(x, includeComment ) )
-                .ToDictionary(x => x.Name, x => x).ToSafe();
+                .ToDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase).ToSafe();
             }                
         }
 

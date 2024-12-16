@@ -30,6 +30,8 @@ namespace BitMinistry
             return Guid.Empty;
         }
 
+        public static int ToBit(this bool bb ) => bb ? 1 : 0;
+
         public static int? SwipeToNInt(this string exp)
         {
             return exp == null ? null : Cnv.CNInt(Regex.Replace(exp, @"[^-+\d]", ""));
