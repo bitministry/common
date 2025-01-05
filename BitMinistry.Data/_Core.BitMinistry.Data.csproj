@@ -49,7 +49,7 @@
 
   <ItemGroup>
 
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
 
     <None Include="README.md" Pack="true" PackagePath="" />
 
