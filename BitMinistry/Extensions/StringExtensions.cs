@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using static System.String;
@@ -374,7 +375,20 @@ namespace BitMinistry
         public static string StringJoin(this string[] strArr, string separator) => strArr?.Length > 0 ? string.Join(",", strArr) : null;
 
 
+        public static string ToBootstrapColor(this Severity severity, bool infoToSuccess = false ) {
+            switch (severity) {
+                case Severity.Error:
+                    return "danger";
+                case Severity.Warn:
+                    return "warning";
+                case Severity.Info :
+                    return infoToSuccess ? "success" : "";
+                default:
+                    return "";
 
+            }
+
+        }
 
     }
 }
