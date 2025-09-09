@@ -260,6 +260,41 @@ namespace BitMinistry.Data
         }
 
 
+        public static List<Dictionary<string, object>> SqlToDicts(this string query, string sqlConnName = null)
+        {
+            var results = new List<Dictionary<string, object>>();
+
+            var connStr = sqlConnName != null ?  
+                (Config.ConnectionStrings.ContainsKey(sqlConnName) ? Config.ConnectionStrings[sqlConnName] : sqlConnName) 
+                : Config.DefaultSqlConnectionString;
+
+            using (var conn = new SqlConnection(connStr))
+            using (var cmd = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    // Cache column names once
+                    var columns = new string[reader.FieldCount];
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        columns[i] = reader.GetName(i);
+
+                    while (reader.Read())
+                    {
+                        var row = new Dictionary<string, object>(columns.Length, StringComparer.OrdinalIgnoreCase);
+                        for (int i = 0; i < columns.Length; i++)
+                            row[columns[i]] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+
+                        results.Add(row);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+
+
     }
 
 }

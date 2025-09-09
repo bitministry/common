@@ -20,7 +20,7 @@ namespace BitMinistry.Data
                 for (int i = 0; i < pars.Length / 2; i++)
                     sql.AddWithValue(pars[i, 0].ToString(), pars[i, 1]);
 
-                return sql.GetData(query).Select(selector);
+                return sql.GetData(query, reset: false ).Select(selector);
             }
 
 
@@ -33,7 +33,7 @@ namespace BitMinistry.Data
                 if (pars != null)
                     foreach (var k in pars.Keys)
                         sql.AddWithValue(k, pars[k]);
-                return sql.GetData(query).Select(selector);
+                return sql.GetData(query, reset: false).Select(selector);
             }
         }
 

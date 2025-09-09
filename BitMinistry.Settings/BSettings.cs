@@ -212,8 +212,11 @@ namespace BitMinistry.Settings
         /// May return null 
         /// save the setting, with default value, if not exists 
         ///</summary>
-        public static string Get(string id, string defaultValue = "")
+        public static string Get(string id, string defaultValue = "", bool refresh = false )
         {
+            if (refresh)
+                ReFreshSetting(id);
+            
             var ret = Config.AppSettings[id] ?? GetSetting(id).NTextValue;
             if ( ret == null && ! string.IsNullOrEmpty( defaultValue ) )
                 Save(new Setting()

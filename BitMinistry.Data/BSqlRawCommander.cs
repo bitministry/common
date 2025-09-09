@@ -64,7 +64,10 @@ namespace BitMinistry.Data
 
         public int? StoredProcedureReturnValue => GetParameterValue("returnInt") as int?;
 
-        public virtual IDataRecord[] GetData(string query = null, bool reset = false)
+
+
+
+        public virtual IDataRecord[] GetData(string query , bool reset = false ) // was default reset=false, changed at 2025-8-18 for consistency with BSqlCom Wrapper extensions (where default =true)
         {
             
             return Execute(x => x.ExecuteReader().Cast<IDataRecord>().ToArray(), query, reset);
@@ -261,18 +264,16 @@ namespace BitMinistry.Data
             if (idValue == null)
                 throw new ArgumentNullException(nameof(idValue));
 
-            Reset();
-
             // parameters[idColumn] = idValue;
 
             var updateWhere = $"{idColumn}={idValue.Sql()}";
 
-            return UpdateAtTable(parameters, tableName, updateWhere, reset: false);
+            return UpdateAtTable(parameters, tableName, updateWhere );
         }
 
-        public int UpdateAtTable(IDictionary<string, object> parameters, string tableName, string updateWhere, bool reset = true)
+        public int UpdateAtTable(IDictionary<string, object> parameters, string tableName, string updateWhere)
         {
-            if (reset) Reset();
+            Reset();
 
             if (string.IsNullOrEmpty(updateWhere))
                 throw new ArgumentNullException(nameof(updateWhere));

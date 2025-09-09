@@ -193,7 +193,7 @@ namespace BitMinistry.Data
             return UpdateAtTable(parameters, tableName, updateWhere, reset: false);
         }
 
-        public int UpdateAtTable(IDictionary<string, object> parameters, string tableName, string updateWhere, bool reset = true)
+        public int UpdateAtTable(IDictionary<string, object> parameters, string tableName, string updateWhere, bool reset )
         {
             if (reset) Reset();
 
