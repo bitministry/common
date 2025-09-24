@@ -3,8 +3,11 @@ from typing import List, Dict, Any, Optional
 import sys, time
 from datetime import timedelta
 from utils.AlcRepo import upsert_data
+from utils.WinLog import LogLevel, log_event
 from utils.intervalDecorator import setInterval
 from utils.Sql import get_data
+
+LOG_SRC = "Bm_WindowsEventsToSql"
 
 LEVEL_XML_MAP = {
     "1": "Critical",
@@ -14,8 +17,15 @@ LEVEL_XML_MAP = {
     "5": "Verbose",
 }
 
-def get_last_time(logtype: str) -> Optional[str]:
-    sql = f"SELECT MAX(time_created) AS last_time FROM dbo.WindowsEvent WHERE log_name = '{logtype}'"
+def xprint( msg: str): 
+    log_event(LogLevel.INFO, msg, source=LOG_SRC)    
+
+def get_last_time(logtype: str ) -> Optional[str]:
+    sql = (
+        "SELECT MAX(time_created) AS last_time "
+        "FROM dbo.WindowsEvent "
+        "WHERE host = '{0}' AND log_name = '{1}'").format(socket.gethostname(), logtype)
+        
     res = get_data(sql)
     if not res or res[0]["last_time"] is None:
         return None
@@ -36,7 +46,6 @@ def resolve_sid(sid_str: str) -> str:
         return sid_str  # fallback to raw SID
 
 def fetch_events(logtype="Application", last_time=None, max_events=100):
-    hostname = socket.gethostname()
     out, count = [], 0
 
     if last_time:
@@ -44,7 +53,7 @@ def fetch_events(logtype="Application", last_time=None, max_events=100):
     else:
         query = "*"
 
-    print(query)
+    xprint( query )
 
     h = win32evtlog.EvtQuery(logtype, win32evtlog.EvtQueryReverseDirection, query)
 
@@ -72,7 +81,7 @@ def fetch_events(logtype="Application", last_time=None, max_events=100):
             message = " | ".join(d.text for d in eventdata.findall(f"{ns}Data") if d.text) if eventdata is not None else None
 
             out.append({
-                "host": hostname,
+                "host": socket.gethostname(),
                 "log_name": logtype,
                 "source": provider,
                 "event_id": event_id,
@@ -95,6 +104,8 @@ def store_events(max_events: int = 10000):
         last_time = get_last_time(log)
         all_data.extend(fetch_events(log, last_time, max_events=max_events))
 
+    xprint( "event count for upsert: " + str(len(all_data)))
+
     if all_data:
         upsert_data(
             data=all_data,
@@ -106,11 +117,15 @@ def store_events(max_events: int = 10000):
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         interval = int(sys.argv[1])
-        print(f"Scheduling event export every {interval} seconds...")
+        xprint(f"Scheduling event export every {interval} seconds...")
 
         @setInterval(intervalSeconds=interval)
         def scheduleExport():
-            store_events()
+            try:
+                store_events()
+            except Exception as e:
+                log_event(LogLevel.ERROR, e, source=LOG_SRC)
+                raise
 
         stop_event = scheduleExport()
 
@@ -118,7 +133,7 @@ if __name__ == "__main__":
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("Stopping schedule...")
+            xprint("Stopping schedule...")
             stop_event.set()
     else:
         store_events()
