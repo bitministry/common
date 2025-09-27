@@ -1,13 +1,13 @@
 import win32security, socket, xml.etree.ElementTree as ET
 from typing import List, Dict, Any, Optional
 import sys, time, subprocess
-from datetime import timedelta
 from utils.AlcRepo import upsert_data
-from utils.WinLog import LogLevel, log_event
+from utils.WinLog import * 
 from utils.intervalDecorator import setInterval
 from utils.Sql import get_scalar
 
-LOG_SRC = "Bm_WindowsEventsToSql"
+mylog_src = "Bm_WindowsEventsToSql"
+logger = EventLogger(mylog_src)
 
 LEVEL_XML_MAP = {
     "1": "Critical",
@@ -16,9 +16,7 @@ LEVEL_XML_MAP = {
     "4": "Information",
     "5": "Verbose",
 }
-
-def xprint( msg: str): 
-    log_event(LogLevel.INFO, msg, source=LOG_SRC)    
+  
 
 def get_last_time(logtype: str) -> int:
     sql = (
@@ -75,18 +73,19 @@ def fetch_events( max_event_record_id:int = 0, logtype: str="Application", max_e
         record_id = sys.find("ev:EventRecordID", ns).text if sys is not None and sys.find("ev:EventRecordID", ns) is not None else None
 
         winuser = resolve_sid(user)
-        events.append({
-            "host": socket.gethostname(),
-            "log_name": logtype,
-            "source": provider,
-            "event_id": event_id,
-            "event_record_id": record_id, 
-            "category": task,
-            "severity": level,
-            "time_created": time_created,
-            "winuser": winuser,
-            "message": message
-        })
+        if provider != mylog_src:
+            events.append({
+                "host": socket.gethostname(),
+                "log_name": logtype,
+                "source": provider,
+                "event_id": event_id,
+                "event_record_id": record_id, 
+                "category": task,
+                "severity": level,
+                "time_created": time_created,
+                "winuser": winuser,
+                "message": message
+            })
 
     return events
 
@@ -99,24 +98,25 @@ def store_events(max_events: int = 10000):
         all_data.extend(fetch_events( max_record_id, log, max_events=max_events))
 
     if all_data:
+        logger.info("storing events:"+ str(len(all_data)) )
         upsert_data(
             data=all_data,
             table_name="dbo.WindowsEvent",
-            id_cols=["host", "log_name", "event_record_id"],
+            id_cols=["host", "log_name", "source", "event_id", "time_created"],
             doInsert=True
         )
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         interval = int(sys.argv[1])
-        xprint(f"Scheduling event export every {interval} seconds...")
+        logger.info(f"Scheduling event export every {interval} seconds...")
 
         @setInterval(intervalSeconds=interval)
         def scheduleExport():
             try:
                 store_events()
             except Exception as e:
-                log_event(LogLevel.ERROR, e, source=LOG_SRC)
+                logger.error( str(e))
                 raise
 
         stop_event = scheduleExport()
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            xprint("Stopping schedule...")
+            logger.info("Stopping schedule...")
             stop_event.set()
     else:
         store_events()
