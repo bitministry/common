@@ -16,7 +16,10 @@ LEVEL_XML_MAP = {
     "4": "Information",
     "5": "Verbose",
 }
-  
+
+def myinfo(msg:str)  :
+    logger.info( msg )
+    print (msg)
 
 def get_last_time(logtype: str) -> int:
     sql = (
@@ -98,7 +101,7 @@ def store_events(max_events: int = 10000):
         all_data.extend(fetch_events( max_record_id, log, max_events=max_events))
 
     if all_data:
-        logger.info("storing events:"+ str(len(all_data)) )
+        myinfo("storing events:"+ str(len(all_data)) )
         upsert_data(
             data=all_data,
             table_name="dbo.WindowsEvent",
@@ -109,7 +112,7 @@ def store_events(max_events: int = 10000):
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         interval = int(sys.argv[1])
-        logger.info(f"Scheduling event export every {interval} seconds...")
+        myinfo(f"Scheduling event export every {interval} seconds...")
 
         @setInterval(intervalSeconds=interval)
         def scheduleExport():
@@ -125,7 +128,7 @@ if __name__ == "__main__":
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            logger.info("Stopping schedule...")
+            myinfo("Stopping schedule...")
             stop_event.set()
     else:
         store_events()
