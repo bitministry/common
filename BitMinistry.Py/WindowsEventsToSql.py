@@ -102,7 +102,7 @@ def store_events(max_events: int = 10000):
         upsert_data(
             data=all_data,
             table_name="dbo.WindowsEvent",
-            id_cols=["host", "log_name", "source", "event_id", "time_created"],
+            id_cols=["host", "log_name", "event_record_id"],
             doInsert=True
         )
 
