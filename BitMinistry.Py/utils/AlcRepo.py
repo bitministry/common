@@ -24,11 +24,13 @@ def upsert_item( item: Dict[str, Any], table_name: str, updatewhere_cols: List[s
     with db.begin() as conn:
         upsert_item(conn, item, table_name, updatewhere_cols, doInsert)
 
-
-def upsert_item(conn : Connection, row: Dict[str, Any], table: str, updatewhere_cols: List[str], doInsert: bool):
+def upsert_item(conn : Connection, row: Dict[str, Any], table: str, updatewhere_cols: List[str], do_insert: bool, ignore_nulls: bool = True):
 
     if isinstance(updatewhere_cols, str):
         raise TypeError("id_cols must be a list of column names, not a string")
+
+    if ignore_nulls : 
+        row = {k: v for k, v in row.items() if v is not None}
 
     cols = list(row.keys())
     updates = [col for col in cols if col not in updatewhere_cols]
@@ -36,7 +38,8 @@ def upsert_item(conn : Connection, row: Dict[str, Any], table: str, updatewhere_
     source = ", ".join(f":{c} AS {c}" for c in cols)
     match = " AND ".join(f"target.{c} = source.{c}" for c in updatewhere_cols)
 
-    if doInsert:
+
+    if do_insert:
         # Full UPSERT
         sql = f"""
         MERGE INTO {table} AS target
@@ -59,6 +62,7 @@ def upsert_item(conn : Connection, row: Dict[str, Any], table: str, updatewhere_
     print (row) 
 
     conn.execute(text(sql), row)
+
 
 
 def dataclass_list_to_dict_list(objs: List[Any]) -> List[Dict[str, Any]]:
