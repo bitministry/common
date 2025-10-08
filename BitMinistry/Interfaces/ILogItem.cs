@@ -22,7 +22,9 @@ namespace BitMinistry
         Debug,
         Info,
         Warn,
-        Error
+        Error,
+
+        Critical
     }
 
 }

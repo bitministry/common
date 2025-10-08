@@ -12,6 +12,15 @@ namespace BitMinistry
             var expressionBody = (MemberExpression)memberExpression.Body;
             return expressionBody.Member.Name;
         }
+        public static object GetPropValue(this object obj, string propName, Type type = null )
+        {
+            if (obj == null || string.IsNullOrWhiteSpace(propName))
+                return null;
+
+            type = type ?? obj.GetType();
+            var prop = type.GetProperty(propName);
+            return prop?.GetValue(obj, null);
+        }
 
         public static void SetPropValue(this PropertyInfo prop, object entity, object value)
         {

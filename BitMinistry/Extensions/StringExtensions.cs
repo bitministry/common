@@ -137,7 +137,7 @@ namespace BitMinistry
 
         public static string NewLineToBR(this string str )
         {
-            return (str ?? "").Replace( Environment.NewLine, "<BR>");
+            return (str ?? "").Replace( "\n", "<BR>");
         }
 
         public static string FontAwesomeIcon(this string str)
