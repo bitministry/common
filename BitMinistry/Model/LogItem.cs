@@ -4,7 +4,7 @@ using System.IO;
 
 namespace BitMinistry
 {
-    public class LogItem<TEnum> : ILogItem, IEntity where TEnum : Enum
+    public class LogItem<TActionEnum> : ILogItem, IEntity where TActionEnum : Enum
     {
         private static string _appDomainName;
 
@@ -13,7 +13,7 @@ namespace BitMinistry
 
 
         // first item for error (default, for ErrorReport)
-        public virtual TEnum Action { get; set; }
+        public virtual TActionEnum Action { get; set; }
 
         [StringLength(1111)]
         public virtual string Message { get; set; }
