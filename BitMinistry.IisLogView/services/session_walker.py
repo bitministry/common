@@ -32,8 +32,6 @@ class SessionState:
             "StartedUtc": self.started_utc,
             "EndedUtc": self.ended_utc,
             "RequestCount": self.request_count,
-            # "EntryPage": self.entry_page,
-            # "ExitPage": self.exit_page,
             "ReferrerClass": self.referrer_class[:32] if self.referrer_class else None,
         }
         if table_has_session_id and self.session_id is not None:

@@ -37,8 +37,6 @@ def process_logs( path: str):
         ip_aggregate = defaultdict(lambda: {
             "urls": Counter(),
             "status": Counter(),
-            "first_seen": None,
-            "last_seen": None,
             "ua": None
         })
 
@@ -61,10 +59,6 @@ def process_logs( path: str):
                 agg["urls"][url] += 1
                 agg["status"][status] += 1
 
-                if not agg["first_seen"] or ts < agg["first_seen"]:
-                    agg["first_seen"] = ts
-                if not agg["last_seen"] or ts > agg["last_seen"]:
-                    agg["last_seen"] = ts
 
         # --- visitor upsert phase ---
         visitor_id_cache = {}
@@ -75,8 +69,6 @@ def process_logs( path: str):
                 ua=data["ua"],
                 urls_counter=data["urls"],
                 status_counter=data["status"],
-                first_seen=data["first_seen"],
-                last_seen=data["last_seen"]
             )
 
             geo = get_ip_info(ip)
@@ -91,8 +83,6 @@ def process_logs( path: str):
                 "Region": geo.get("subdivisions"),
                 "Latitude": geo.get("latitude"),
                 "Longitude": geo.get("longitude"),
-                "FirstSeenUtc": data["first_seen"],
-                "LastSeenUtc": data["last_seen"]
             }
 
             sql.upsert_item(

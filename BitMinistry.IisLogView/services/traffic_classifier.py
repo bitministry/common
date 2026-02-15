@@ -1,6 +1,5 @@
 import re
 from collections import Counter
-from datetime import datetime
 
 
 # ============================================================
@@ -151,8 +150,6 @@ def classify_human_vs_bot(
     ua: str,
     urls_counter: Counter,
     status_counter: Counter,
-    first_seen: datetime,
-    last_seen: datetime
 ):
     score = 0
 
@@ -175,13 +172,7 @@ def classify_human_vs_bot(
     else:
         error_ratio = 0
 
-    active_seconds = max(int((last_seen - first_seen).total_seconds()), 1)
-    rps = total / active_seconds if active_seconds else 0
-
     # --- Behavior heuristics ---
-    if rps > 3:
-        score += 4
-
     if unique_urls > 200:
         score += 3
 
@@ -196,7 +187,6 @@ def classify_human_vs_bot(
     return {
         "is_bot": is_bot,
         "bot_score": score,
-        "rps": round(rps, 2),
         "unique_urls": unique_urls,
         "error_ratio": round(error_ratio, 2)
     }
