@@ -120,6 +120,9 @@ def process_logs( path: str):
                 continue
 
             url = row.get("cs-uri-stem", "")
+            if is_asset_path(url):
+                continue
+
             query = row.get("cs-uri-query")
             method = row.get("cs-method")
             status = int(row.get("sc-status", 0))
@@ -163,8 +166,7 @@ def process_logs( path: str):
                 "UrlPath": url[:128],
                 "QueryString": None if query == "-" else query[:256] if query else None,
                 "StatusCode": status,
-                "TimeTakenMs": int(time_taken) if time_taken and time_taken != "-" else None,
-                "IsAsset": 1 if is_asset_path(url) else 0
+                "TimeTakenMs": int(time_taken) if time_taken and time_taken != "-" else None
             }
 
             sql.upsert_item(
