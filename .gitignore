@@ -20,4 +20,9 @@ nuget-push.bat
 *.suo
 *.log
 
-/BitMinistry.Py/_config.py
+_config.py
+
+
+__pycache__/
+*.py[cod]
+*.tmp.*
