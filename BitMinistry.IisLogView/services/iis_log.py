@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from collections import defaultdict, Counter
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from _config import ALCHEMY_CONN_STR
 import utils.sql as sql 
 from services.traffic_classifier import *
@@ -33,8 +33,8 @@ def process_logs( path: str):
         })
         buffered_rows = []  # (host, row_dict, ts)
 
+        host = os.path.basename(path)
         for root, _, files in os.walk(path):
-            host = os.path.basename(root)
             for file in files:
                 if not file.endswith(".log"):
                     continue
@@ -171,7 +171,7 @@ def process_logs( path: str):
                 conn,
                 request_row,
                 REQUEST_TABLE,
-                updatewhere_cols=["SessionId", "RequestTimeUtc", "UrlPath"],
+                updatewhere_cols=[],
                 doInsert=True
             )
 
@@ -186,16 +186,15 @@ def process_logs( path: str):
                 doInsert=True
             )
 
-        # cleanup: delete old processed data (exclude today)
-        host_name = os.path.basename(path)
-        today = datetime.today().strftime("%Y-%m-%d")
-        conn.execute(text(
-            f"DELETE FROM {REQUEST_TABLE} WHERE SessionId IN "
-            f"(SELECT SessionId FROM {SESSION_TABLE} WHERE Host = :host AND StartedUtc < :today)"
-        ), {"host": host_name, "today": today})
-        conn.execute(text(
-            f"DELETE FROM {SESSION_TABLE} WHERE Host = :host AND StartedUtc < :today"
-        ), {"host": host_name, "today": today})
+        # cleanup: delete processed .log files (exclude today's)
+        today_suffix = datetime.today().strftime("%y%m%d")  # e.g. "260215"
+        for root, _, files in os.walk(path):
+            for file in files:
+                if not file.endswith(".log"):
+                    continue
+                if today_suffix in file:
+                    continue
+                os.remove(os.path.join(root, file))
 
 
 
