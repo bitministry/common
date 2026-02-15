@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Tuple, Any
 @dataclass
 class SessionState:
     # identity
-    visitor_id: int
+    visitor_id: str
     host: str
 
     # timing
@@ -27,7 +27,7 @@ class SessionState:
 
     def to_row(self, table_has_session_id: bool = False) -> dict:
         row = {
-            "VisitorId": self.visitor_id,
+            "IpAddress": self.visitor_id,
             "Host": self.host[:32] if self.host else None,
             "StartedUtc": self.started_utc,
             "EndedUtc": self.ended_utc,
@@ -55,7 +55,7 @@ class SessionWalker:
 
     def observe(
         self,
-        visitor_id: int,
+        visitor_id: str,
         host: str,
         ts_utc: datetime,
         url_path: Optional[str] = None,

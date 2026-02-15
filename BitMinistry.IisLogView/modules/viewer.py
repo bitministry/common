@@ -73,10 +73,9 @@ class ViewerModuleImpl(ViewerModule):
                     v.IsBot,
                     s.StartedUtc,
                     s.ReferrerClass,
-                    s.TotalRequests,
-                    s.DurationSeconds
+                    s.RequestCount
                 FROM IisSessions s
-                JOIN IisVisitors v ON v.VisitorId = s.VisitorId
+                JOIN IisVisitors v ON v.IpAddress = s.IpAddress
                 ORDER BY s.StartedUtc DESC
             """)
             if not df_sess.empty:
@@ -92,7 +91,7 @@ class ViewerModuleImpl(ViewerModule):
                     r.Method,
                     r.UrlPath,
                     r.StatusCode,
-                    r.TimeOnPageSec
+                    r.TimeTakenMs
                 FROM IisRequests r
                 ORDER BY r.RequestTimeUtc DESC
             """)

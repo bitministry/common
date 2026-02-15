@@ -146,47 +146,15 @@ def normalize_referrer(ref: str) -> str:
 # FULL BOT CLASSIFICATION (UA + BEHAVIOR)
 # ============================================================
 
-def classify_human_vs_bot(
-    ua: str,
-    urls_counter: Counter,
-    status_counter: Counter,
-):
+def classify_human_vs_bot(ua: str):
     score = 0
 
-    # --- UA signature ---
     if not ua:
         score += 3
     else:
         if BOT_REGEX.search(ua):
             score += 5
-
         if "headless" in ua.lower():
             score += 4
 
-    total = sum(urls_counter.values())
-    unique_urls = len(urls_counter)
-    notfound = status_counter.get(404, 0)
-
-    if total > 0:
-        error_ratio = notfound / total
-    else:
-        error_ratio = 0
-
-    # --- Behavior heuristics ---
-    if unique_urls > 200:
-        score += 3
-
-    if total > 50 and error_ratio > 0.5:
-        score += 3
-
-    if total > 300:
-        score += 3
-
-    is_bot = score >= 5
-
-    return {
-        "is_bot": is_bot,
-        "bot_score": score,
-        "unique_urls": unique_urls,
-        "error_ratio": round(error_ratio, 2)
-    }
+    return score >= 5
