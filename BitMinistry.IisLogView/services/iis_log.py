@@ -23,7 +23,17 @@ def process_logs( path: str):
 
     db = create_engine(ALCHEMY_CONN_STR)
     with db.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
-        # --- single pass: aggregate + buffer rows ---
+        today_suffix = datetime.today().strftime("%y%m%d")
+        host = os.path.basename(path)
+
+        # --- collect log files to process ---
+        log_files = []
+        for root, _, files in os.walk(path):
+            for file in files:
+                if file.endswith(".log") and today_suffix not in file:
+                    log_files.append(os.path.join(root, file))
+
+        # --- pass 1: aggregate per-IP stats ---
         ip_aggregate = defaultdict(lambda: {
             "urls": Counter(),
             "status": Counter(),
@@ -31,38 +41,30 @@ def process_logs( path: str):
             "last_seen": None,
             "ua": None
         })
-        buffered_rows = []  # (host, row_dict, ts)
 
-        host = os.path.basename(path)
-        for root, _, files in os.walk(path):
-            for file in files:
-                if not file.endswith(".log"):
+        for log_file in log_files:
+            for row in iterate_iis_rows(log_file):
+                ip = row.get("c-ip")
+                if not ip:
                     continue
 
-                for row in iterate_iis_rows(os.path.join(root, file)):
-                    ip = row.get("c-ip")
-                    if not ip:
-                        continue
+                ts = parse_timestamp(row)
+                if not ts:
+                    continue
 
-                    ts = parse_timestamp(row)
-                    if not ts:
-                        continue
+                ua = row.get("cs(User-Agent)", "")
+                url = row.get("cs-uri-stem", "")
+                status = int(row.get("sc-status", 0))
 
-                    ua = row.get("cs(User-Agent)", "")
-                    url = row.get("cs-uri-stem", "")
-                    status = int(row.get("sc-status", 0))
+                agg = ip_aggregate[ip]
+                agg["ua"] = ua
+                agg["urls"][url] += 1
+                agg["status"][status] += 1
 
-                    agg = ip_aggregate[ip]
-                    agg["ua"] = ua
-                    agg["urls"][url] += 1
-                    agg["status"][status] += 1
-
-                    if not agg["first_seen"] or ts < agg["first_seen"]:
-                        agg["first_seen"] = ts
-                    if not agg["last_seen"] or ts > agg["last_seen"]:
-                        agg["last_seen"] = ts
-
-                    buffered_rows.append((host, row, ts))
+                if not agg["first_seen"] or ts < agg["first_seen"]:
+                    agg["first_seen"] = ts
+                if not agg["last_seen"] or ts > agg["last_seen"]:
+                    agg["last_seen"] = ts
 
         # --- visitor upsert phase ---
         visitor_id_cache = {}
@@ -110,25 +112,33 @@ def process_logs( path: str):
 
             visitor_id_cache[ip] = visitor_id
 
-        # --- request insert + sessionization phase (from buffer) ---
+        # --- pass 2: requests + sessionization ---
         walker = SessionWalker(timeout_minutes=30)
 
-        for host, row, ts in buffered_rows:
-            ip = row.get("c-ip")
-            visitor_id = visitor_id_cache.get(ip)
-            if not visitor_id:
-                continue
+        for log_file in log_files:
+            for row in iterate_iis_rows(log_file):
+                ip = row.get("c-ip")
+                if not ip:
+                    continue
 
-            url = row.get("cs-uri-stem", "")
-            if is_asset_path(url):
-                continue
+                ts = parse_timestamp(row)
+                if not ts:
+                    continue
 
-            query = row.get("cs-uri-query")
-            method = row.get("cs-method")
-            status = int(row.get("sc-status", 0))
-            time_taken = row.get("time-taken")
-            ref = row.get("cs(Referer)")
-            ref_class = normalize_referrer(ref)
+                visitor_id = visitor_id_cache.get(ip)
+                if not visitor_id:
+                    continue
+
+                url = row.get("cs-uri-stem", "")
+                if is_asset_path(url):
+                    continue
+
+                query = row.get("cs-uri-query")
+                method = row.get("cs-method")
+                status = int(row.get("sc-status", 0))
+                time_taken = row.get("time-taken")
+                ref = row.get("cs(Referer)")
+                ref_class = normalize_referrer(ref)
 
             # session tracking
             events = walker.observe(
@@ -188,15 +198,9 @@ def process_logs( path: str):
                 doInsert=True
             )
 
-        # cleanup: delete processed .log files (exclude today's)
-        today_suffix = datetime.today().strftime("%y%m%d")  # e.g. "260215"
-        for root, _, files in os.walk(path):
-            for file in files:
-                if not file.endswith(".log"):
-                    continue
-                if today_suffix in file:
-                    continue
-                os.remove(os.path.join(root, file))
+        # cleanup: delete processed .log files
+        for log_file in log_files:
+            os.remove(log_file)
 
 
 
