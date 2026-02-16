@@ -79,6 +79,8 @@ def process_logs( path: str):
                 method = row.get("cs-method")
                 status = int(row.get("sc-status", 0))
                 time_taken = row.get("time-taken")
+                ref = row.get("cs(Referer)")
+                ref_class = normalize_referrer(ref)
 
                 request_row = {
                     "IpAddress": ip,
@@ -88,7 +90,8 @@ def process_logs( path: str):
                     "UrlPath": url[:128],
                     "QueryString": None if query == "-" else query[:256] if query else None,
                     "StatusCode": status,
-                    "TimeTakenMs": int(time_taken) if time_taken and time_taken != "-" else None
+                    "TimeTakenMs": int(time_taken) if time_taken and time_taken != "-" else None,
+                    "ReferrerClass": ref_class[:32] if ref_class else None
                 }
 
                 sql.upsert_item(
