@@ -103,3 +103,18 @@ def insert_data(data: List[Dict[str, Any]], table_name: str, conn_str: str = ALC
             vals = ", ".join([f":{c}" for c in cols])
             sql = text(f"INSERT INTO {table_name} ({names}) VALUES ({vals})")
             conn.execute(sql, row)
+
+
+def bulk_insert(rows: List[Dict[str, Any]], table_name: str, conn_str: str = DB_CONN_STR):
+    if not rows:
+        return
+    cols = list(rows[0].keys())
+    placeholders = ", ".join("?" for _ in cols)
+    stmt = f"INSERT INTO {table_name} ({', '.join(cols)}) VALUES ({placeholders})"
+
+    with pyodbc.connect(conn_str) as conn:
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.fast_executemany = True
+        cur.executemany(stmt, [tuple(r[c] for c in cols) for r in rows])
+        cur.close()

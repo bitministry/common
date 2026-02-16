@@ -9,6 +9,7 @@ from services.geo_locate import get_ip_info
 
 VISITOR_TABLE = "IisVisitors"
 REQUEST_TABLE = "IisRequests"
+BATCH_SIZE = 5000
 
 
 # -------------------------------------------------
@@ -33,6 +34,8 @@ def process_logs( path: str):
 
         # --- load known IPs from DB ---
         known_ips = {r["IpAddress"] for r in sql.query("SELECT IpAddress FROM IisVisitors")}
+
+        request_batch = []
 
         # --- single pass ---
         for log_file in log_files:
@@ -82,7 +85,7 @@ def process_logs( path: str):
                 ref = row.get("cs(Referer)")
                 ref_class = normalize_referrer(ref)
 
-                request_row = {
+                request_batch.append({
                     "IpAddress": ip,
                     "Host": host[:32],
                     "RequestTimeUtc": ts,
@@ -92,15 +95,14 @@ def process_logs( path: str):
                     "StatusCode": status,
                     "TimeTakenMs": int(time_taken) if time_taken and time_taken != "-" else None,
                     "ReferrerClass": ref_class[:32] if ref_class else None
-                }
+                })
 
-                sql.upsert_item(
-                    conn,
-                    request_row,
-                    REQUEST_TABLE,
-                    updatewhere_cols=[],
-                    doInsert=True
-                )
+                if len(request_batch) >= BATCH_SIZE:
+                    sql.bulk_insert(request_batch, REQUEST_TABLE)
+                    request_batch.clear()
+
+        # flush remaining
+        sql.bulk_insert(request_batch, REQUEST_TABLE)
 
         # cleanup: delete processed .log files
         for log_file in log_files:
