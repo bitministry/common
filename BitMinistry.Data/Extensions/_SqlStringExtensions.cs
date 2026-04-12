@@ -136,6 +136,24 @@ namespace BitMinistry.Data
             };
         }
 
+        public static SqlParameter ToDoubleLongParameter(this IEnumerable<KeyValuePair<long, long>> ina, string parName)
+        {
+            DataTable dataTable = new DataTable();
+            dataTable.Columns.Add(new DataColumn("long1", typeof(long)));
+            dataTable.Columns.Add(new DataColumn("long2", typeof(long)));
+
+            foreach (var id in ina)
+                dataTable.Rows.Add(id.Key, id.Value);
+
+            return new SqlParameter()
+            {
+                ParameterName = parName,
+                SqlDbType = SqlDbType.Structured,
+                TypeName = "dbo.doublelong",
+                Value = dataTable
+            };
+        }
+
 
         public static String CommandAsSql(this IDbCommand sc, bool scriptReturnValue = false, bool scriptUseDb = false)
         {

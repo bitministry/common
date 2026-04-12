@@ -147,7 +147,7 @@ namespace BitMinistry.Settings
 
             if (setting == null)
             {
-                var value = Config.AppSettings[id];
+                var value = Config.AppSettings[id] ?? Config.AppSettings[id.Replace(":", ".")];
                 setting = new Setting() { Name = id, NTextValue = value };
                 if (value.IsNumeric())
                 {
@@ -217,7 +217,7 @@ namespace BitMinistry.Settings
             if (refresh)
                 ReFreshSetting(id);
             
-            var ret = Config.AppSettings[id] ?? GetSetting(id).NTextValue;
+            var ret = GetSetting(id).NTextValue;
             if ( ret == null && ! string.IsNullOrEmpty( defaultValue ) )
                 Save(new Setting()
                 {

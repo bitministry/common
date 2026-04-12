@@ -42,6 +42,7 @@ namespace BitMinistry.Data
                             prop == typeof(bool) ||
                             prop == typeof(float) ||
                             prop.IsEnum ||
+                            prop == typeof(byte) ||
                             prop == typeof(Int16) ||
                             prop == typeof(decimal) ||
                             prop == typeof(double) ||
