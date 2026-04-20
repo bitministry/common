@@ -25,7 +25,7 @@ namespace BitMinistry.OpenAi
             if (string.IsNullOrWhiteSpace(model))
                 throw new ArgumentException("Model name is required.", nameof(model));
 
-            _http = new HttpClient
+            _http = new HttpClient(LocalNetwork.CreateHandler())
             {
                 Timeout = TimeSpan.FromMinutes(5)
             };
