@@ -48,6 +48,18 @@ namespace BitMinistry.Data
             }
         }
 
+        public static IDataRecord[] GetData (this string query, (string, object)[] pars = null, CommandType type = CommandType.Text)
+        {
+            using (var sql = new BSqlRawCommander(comType: type))
+            {
+                if (pars != null)
+                    foreach (var par in pars)
+                        sql.AddWithValue(par.Item1, par.Item2);
+                return sql.GetData(query);
+            }
+        }
+
+
         public static int ExecuteSqlNonQuery(this string query, CommandType type = CommandType.Text, params KeyValuePair<string, object>[] pars)
         {
             using (var sql = new BSqlRawCommander(comType: type))
