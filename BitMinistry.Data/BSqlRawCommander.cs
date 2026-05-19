@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace BitMinistry.Data
 {
@@ -77,6 +78,7 @@ namespace BitMinistry.Data
 
 
         public bool TryCatchTheExecute = false;
+        public static string FailOverServerName;
 
         protected T ExecuteSql<T>(Func<SqlCommand, T> sqlFunc)
         {
@@ -84,7 +86,33 @@ namespace BitMinistry.Data
             using (Com.Connection = new SqlConnection(ConnectionString))
             {
                 Com.Connection.InfoMessage += InfoMessage;
-                Com.Connection.Open();
+                if (FailOverServerName == null)
+                    Com.Connection.Open();
+                else 
+                    try
+                    {
+                        Com.Connection.Open();
+                    }
+                    catch ( SqlException ex ) {
+                        var cs = new SqlConnectionStringBuilder(Config.DefaultSqlConnectionString);
+
+                        if (cs["server"] == FailOverServerName) // already switched, but still failed 
+                            throw;
+
+                        var dbName = cs["database"];
+                        cs["server"] = FailOverServerName;
+                        cs["database"] = "master";
+
+                        using (var sqlToNuMaster = new BSqlRawCommander(cs.ToString()))
+                            sqlToNuMaster.ExecuteNonQuery($"RESTORE LOG [{dbName}] WITH RECOVERY");
+
+                        cs["database"] = dbName;
+
+                        Com.Connection.ConnectionString = cs.ToString();
+                        Com.Connection.Open();
+                        Config.DefaultSqlConnectionString = Com.Connection.ConnectionString;
+                    }
+
                 if (Com.Connection.State == ConnectionState.Open)
                     if (!TryCatchTheExecute)
                         return sqlFunc(Com);
